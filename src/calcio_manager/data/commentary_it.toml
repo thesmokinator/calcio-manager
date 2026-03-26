@@ -1,0 +1,163 @@
+# Template di commento in italiano per le partite
+
+[goal]
+templates = [
+    "GOOOL! {scorer} porta in vantaggio la {team}!",
+    "GOOOL! {scorer} non sbaglia davanti al portiere! {score}",
+    "GOOOL! Gran gol di {scorer}! La {team} esulta!",
+    "GOOOL! {scorer} di testa! Rete bellissima!",
+    "GOOOL! Tiro imparabile di {scorer}! {score}",
+    "GOOOL! {scorer} la piazza nell'angolino! Niente da fare per il portiere!",
+    "GOOOL! Azione corale e {scorer} finalizza! {score}",
+    "GOOOL! Contropiede fulmineo e {scorer} non perdona!",
+]
+
+templates_with_assist = [
+    "GOOOL! {scorer} su assist di {assist}! {score}",
+    "GOOOL! Bell'azione: {assist} serve {scorer} che non sbaglia!",
+    "GOOOL! Cross di {assist} e {scorer} insacca! {score}",
+    "GOOOL! Combinazione {assist}-{scorer}, gol fantastico!",
+    "GOOOL! {assist} mette in mezzo, {scorer} di prima intenzione! {score}",
+]
+
+[chance]
+templates = [
+    "Occasione per la {team}! {player} ci prova ma non trova la porta.",
+    "Buona azione della {team}, ma manca l'ultimo passaggio.",
+    "La {team} si fa pericolosa in avanti.",
+    "Pressing alto della {team}, la difesa avversaria regge.",
+]
+
+[shot_saved]
+templates = [
+    "Tiro di {player}, para il portiere!",
+    "Gran parata su {player}! Il portiere si supera!",
+    "{player} calcia, respinge il portiere!",
+    "Bella conclusione di {player}, ma il portiere c'è!",
+    "Tiro potente di {player}, il portiere si distende e blocca!",
+]
+
+[shot_wide]
+templates = [
+    "Tiro di {player}, fuori di poco!",
+    "{player} calcia a lato, palla sul fondo.",
+    "Conclusione di {player}, alta sopra la traversa!",
+    "{player} spreca una buona occasione, tiro fuori.",
+]
+
+[shot_post]
+templates = [
+    "PALO! {player} centra il legno, che sfortuna!",
+    "Traversa piena di {player}! Che botta!",
+    "{player} colpisce il palo, la palla torna in campo!",
+]
+
+[foul]
+templates = [
+    "Fallo di {player}, punizione per la {opponent}.",
+    "Intervento falloso di {player}.",
+    "{player} commette fallo, l'arbitro fischia.",
+    "Fallo tattico di {player}, gioco fermo.",
+]
+
+[yellow_card]
+templates = [
+    "Cartellino giallo per {player}! Ammonito dall'arbitro.",
+    "Giallo per {player}, intervento troppo duro.",
+    "{player} ammonito. Deve stare attento ora.",
+]
+
+[red_card]
+templates = [
+    "ROSSO! {player} espulso! La {team} resta in inferiorità!",
+    "Cartellino rosso diretto per {player}! Bruttissimo fallo!",
+    "L'arbitro estrae il rosso! {player} deve lasciare il campo!",
+]
+
+[second_yellow]
+templates = [
+    "Secondo giallo per {player}! Espulso! La {team} in dieci!",
+    "{player} rimedia il secondo giallo e viene espulso!",
+]
+
+[substitution]
+templates = [
+    "Sostituzione nella {team}: entra {player_in}, esce {player_out}.",
+    "Cambio per la {team}: {player_out} lascia il posto a {player_in}.",
+]
+
+[corner]
+templates = [
+    "Calcio d'angolo per la {team}.",
+    "Corner per la {team}, {player} va sul pallone.",
+]
+
+[half_time]
+templates = [
+    "Fine primo tempo! {home} {home_goals} - {away_goals} {away}",
+    "L'arbitro fischia la fine del primo tempo. {home} {home_goals} - {away_goals} {away}",
+]
+
+[full_time]
+templates = [
+    "Fine partita! {home} {home_goals} - {away_goals} {away}",
+    "L'arbitro fischia tre volte! Finisce {home} {home_goals} - {away_goals} {away}",
+]
+
+[kick_off]
+templates = [
+    "Calcio d'inizio! Si parte!",
+    "L'arbitro fischia, comincia la partita!",
+    "Si gioca! {home} contro {away}.",
+]
+
+[penalty_shootout_start]
+templates = [
+    "Si va ai calci di rigore!",
+    "Pareggio! Si decide tutto dal dischetto!",
+]
+
+[penalty_scored]
+templates = [
+    "RIGORE SEGNATO! {player} non sbaglia!",
+    "{player} spiazza il portiere! Gol dal dischetto!",
+    "Rigore trasformato da {player}!",
+]
+
+[penalty_missed]
+templates = [
+    "RIGORE SBAGLIATO! {player} calcia fuori!",
+    "{player} spara alto! Rigore fallito!",
+]
+
+[penalty_saved]
+templates = [
+    "PARATO! Il portiere respinge il rigore di {player}!",
+    "Gran parata del portiere sul rigore di {player}!",
+]
+
+[possession]
+templates = [
+    "La {team} gestisce il possesso palla.",
+    "Fase di gioco controllata dalla {team}.",
+    "Buon palleggio della {team} a centrocampo.",
+    "La {team} fa circolare palla nella propria metà campo.",
+    "Giro palla della {team}, cercano spazi.",
+    "Possesso sterile della {team}, la difesa avversaria tiene.",
+    "La {team} prova a costruire dal basso.",
+    "Centrocampo intasato, la {team} cerca il varco giusto.",
+    "Ritmo blando in questa fase, palla alla {team}.",
+    "Fase di studio tra le due squadre.",
+    "Si gioca a centrocampo, nessuna delle due rischia troppo.",
+    "La {team} mantiene il possesso senza fretta.",
+    "Palleggio a centrocampo, la {team} gestisce il ritmo.",
+    "Momento tranquillo della partita, possesso {team}.",
+    "Nulla di particolare in questa fase, palla alla {team}.",
+    "La {team} prova a dettare i tempi della partita.",
+]
+
+[timeout]
+templates = [
+    "Time-out chiamato dalla {team}! Due minuti per riorganizzarsi.",
+    "La {team} chiama il time-out. Pausa tattica.",
+]

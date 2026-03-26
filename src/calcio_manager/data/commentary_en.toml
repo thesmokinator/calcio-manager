@@ -1,0 +1,163 @@
+# English match commentary templates
+
+[goal]
+templates = [
+    "GOAAL! {scorer} puts {team} ahead!",
+    "GOAAL! {scorer} makes no mistake in front of goal! {score}",
+    "GOAAL! What a strike from {scorer}! {team} celebrate!",
+    "GOAAL! {scorer} heads it in! Beautiful goal!",
+    "GOAAL! Unstoppable shot from {scorer}! {score}",
+    "GOAAL! {scorer} tucks it into the corner! The keeper had no chance!",
+    "GOAAL! Great team play and {scorer} finishes it off! {score}",
+    "GOAAL! Lightning counter-attack and {scorer} doesn't miss!",
+]
+
+templates_with_assist = [
+    "GOAAL! {scorer} finishes off a lovely pass from {assist}! {score}",
+    "GOAAL! Brilliant play: {assist} sets up {scorer} who makes no mistake!",
+    "GOAAL! Cross from {assist} and {scorer} buries it! {score}",
+    "GOAAL! {assist} and {scorer} combine beautifully, what a goal!",
+    "GOAAL! {assist} delivers, {scorer} strikes first time! {score}",
+]
+
+[chance]
+templates = [
+    "Chance for {team}! {player} has a go but can't find the target.",
+    "Good move from {team}, but the final ball is lacking.",
+    "{team} looking dangerous going forward.",
+    "High pressing from {team}, but the defence holds firm.",
+]
+
+[shot_saved]
+templates = [
+    "Shot from {player}, saved by the keeper!",
+    "Great save to deny {player}! The goalkeeper excels!",
+    "{player} shoots, the keeper pushes it away!",
+    "Good effort from {player}, but the keeper is equal to it!",
+    "Powerful shot from {player}, the keeper dives and holds!",
+]
+
+[shot_wide]
+templates = [
+    "Shot from {player}, just wide!",
+    "{player} fires wide, ball goes out for a goal kick.",
+    "{player}'s effort sails over the crossbar!",
+    "{player} wastes a good chance, shot goes wide.",
+]
+
+[shot_post]
+templates = [
+    "OFF THE POST! {player} hits the woodwork, so unlucky!",
+    "Off the crossbar from {player}! What a hit!",
+    "{player} strikes the post, the ball bounces back into play!",
+]
+
+[foul]
+templates = [
+    "Foul by {player}, free kick to {opponent}.",
+    "Clumsy challenge by {player}.",
+    "{player} commits a foul, the referee blows the whistle.",
+    "Tactical foul by {player}, play is stopped.",
+]
+
+[yellow_card]
+templates = [
+    "Yellow card for {player}! Booked by the referee.",
+    "Booking for {player}, that was a reckless challenge.",
+    "{player} picks up a yellow card. Must be careful now.",
+]
+
+[red_card]
+templates = [
+    "RED CARD! {player} is sent off! {team} down to fewer players!",
+    "Straight red for {player}! Terrible challenge!",
+    "The referee shows the red card! {player} must leave the pitch!",
+]
+
+[second_yellow]
+templates = [
+    "Second yellow for {player}! Sent off! {team} down a player!",
+    "{player} picks up a second booking and is sent off!",
+]
+
+[substitution]
+templates = [
+    "Substitution for {team}: {player_in} comes on for {player_out}.",
+    "Change for {team}: {player_out} makes way for {player_in}.",
+]
+
+[corner]
+templates = [
+    "Corner kick for {team}.",
+    "Corner to {team}, {player} to take it.",
+]
+
+[half_time]
+templates = [
+    "Half time! {home} {home_goals} - {away_goals} {away}",
+    "The referee blows for half time. {home} {home_goals} - {away_goals} {away}",
+]
+
+[full_time]
+templates = [
+    "Full time! {home} {home_goals} - {away_goals} {away}",
+    "The referee blows the final whistle! It finishes {home} {home_goals} - {away_goals} {away}",
+]
+
+[kick_off]
+templates = [
+    "Kick off! Here we go!",
+    "The referee blows the whistle, the match is underway!",
+    "We're off! {home} against {away}.",
+]
+
+[penalty_shootout_start]
+templates = [
+    "It goes to a penalty shootout!",
+    "It's a draw! Time to settle it from the spot!",
+]
+
+[penalty_scored]
+templates = [
+    "PENALTY SCORED! {player} makes no mistake!",
+    "{player} sends the keeper the wrong way! Goal from the spot!",
+    "Penalty converted by {player}!",
+]
+
+[penalty_missed]
+templates = [
+    "PENALTY MISSED! {player} fires over!",
+    "{player} blazes it high! Penalty wasted!",
+]
+
+[penalty_saved]
+templates = [
+    "SAVED! The keeper stops {player}'s penalty!",
+    "Great save from the keeper to deny {player} from the spot!",
+]
+
+[possession]
+templates = [
+    "{team} keeping hold of the ball.",
+    "{team} controlling the tempo of the game.",
+    "Neat passing from {team} in midfield.",
+    "{team} circulating the ball in their own half.",
+    "{team} passing it around, looking for an opening.",
+    "Sterile possession from {team}, the defence standing firm.",
+    "{team} trying to build from the back.",
+    "Congested midfield, {team} searching for a gap.",
+    "Quiet spell in the match, {team} on the ball.",
+    "Cagey period, both sides feeling each other out.",
+    "It's all in midfield, neither side taking risks.",
+    "{team} keeping possession without rushing.",
+    "Passing in midfield, {team} dictating the pace.",
+    "Calm moment in the match, {team} in possession.",
+    "Nothing much happening here, ball with {team}.",
+    "{team} trying to set the rhythm of the game.",
+]
+
+[timeout]
+templates = [
+    "Time-out called by {team}! Two minutes to regroup.",
+    "{team} call a time-out. Tactical break.",
+]

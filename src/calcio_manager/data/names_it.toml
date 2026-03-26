@@ -1,0 +1,61 @@
+# Pool di nomi italiani per la generazione di giocatori
+
+[names]
+first_names = [
+    "Marco", "Luca", "Alessandro", "Andrea", "Matteo",
+    "Lorenzo", "Davide", "Simone", "Federico", "Giuseppe",
+    "Giovanni", "Francesco", "Stefano", "Roberto", "Daniele",
+    "Paolo", "Antonio", "Fabio", "Massimo", "Claudio",
+    "Riccardo", "Nicola", "Emanuele", "Alberto", "Diego",
+    "Filippo", "Giacomo", "Tommaso", "Cristian", "Manuel",
+    "Salvatore", "Vincenzo", "Gianluca", "Mauro", "Angelo",
+    "Pietro", "Michele", "Enrico", "Carlo", "Giorgio",
+    "Mattia", "Edoardo", "Leonardo", "Gabriele", "Alessio",
+    "Christian", "Ivan", "Patrick", "Denis", "Kevin",
+    "Omar", "Samuel", "Thomas", "Alex", "Brian",
+    "Mirko", "Samuele", "Elia", "Jacopo", "Nicholas",
+]
+
+last_names = [
+    "Rossi", "Russo", "Ferrari", "Esposito", "Bianchi",
+    "Romano", "Colombo", "Ricci", "Marino", "Greco",
+    "Bruno", "Gallo", "Conti", "De Luca", "Mancini",
+    "Costa", "Giordano", "Rizzo", "Lombardi", "Moretti",
+    "Barbieri", "Fontana", "Santoro", "Mariani", "Rinaldi",
+    "Caruso", "Ferrara", "Galli", "Martini", "Leone",
+    "Longo", "Gentile", "Martinelli", "Vitale", "Pellegrini",
+    "Serra", "Sala", "Cattaneo", "Villa", "Colombo",
+    "Ferri", "Bassi", "Rizzi", "Marchetti", "Parisi",
+    "Mazza", "Fabbri", "Grasso", "Valentini", "Monti",
+    "Testa", "Benedetti", "De Santis", "Marini", "Coppola",
+    "Fiore", "Grassi", "Neri", "Palmieri", "Bernardi",
+]
+
+[teams]
+# Prefissi e suffissi per generare nomi di squadre credibili
+prefixes = [
+    "Pol.", "ASD", "FC", "US", "GS",
+    "Real", "SC", "AC", "SS", "SSD",
+]
+
+suffixes = [
+    "United", "Calcio", "Sport", "Club", "Team",
+]
+
+# Nomi base per squadre (verranno combinati con località)
+base_names = [
+    "Aurora", "Stella", "Olimpia", "Virtus", "Fortuna",
+    "Libertas", "Victoria", "Atletico", "Rapid", "Juvenilia",
+    "Progresso", "Concordia", "Vigor", "Fulgor", "Audax",
+    "Robur", "Forza", "Cosmos", "Saturno", "Hellas",
+    "Vis", "Ardens", "Edelweiss", "Fenice", "Leonessa",
+]
+
+# Località fittizie ma credibili per la provincia di Varese
+[teams.varese]
+locations = [
+    "Varese", "Busto Arsizio", "Gallarate", "Saronno", "Tradate",
+    "Luino", "Laveno", "Castellanza", "Malnate", "Gavirate",
+    "Sesto Calende", "Angera", "Besozzo", "Caronno", "Somma Lombardo",
+    "Cardano al Campo", "Vergiate", "Oggiona", "Castiglione Olona", "Azzate",
+]

@@ -1,0 +1,55 @@
+/* Calcio Manager - Global styles */
+
+Screen {
+    background: $surface;
+}
+
+#title {
+    text-align: center;
+    text-style: bold;
+    color: $text;
+    padding: 1 2;
+}
+
+.subtitle {
+    text-align: center;
+    color: $text-muted;
+    padding: 0 2;
+}
+
+.menu-button {
+    width: 100%;
+    margin: 1 4;
+}
+
+.panel {
+    border: solid $primary;
+    padding: 1 2;
+    margin: 1 2;
+}
+
+.header-bar {
+    dock: top;
+    height: 3;
+    background: $primary;
+    color: $text;
+    text-align: center;
+    padding: 1;
+}
+
+.footer-bar {
+    dock: bottom;
+    height: 1;
+    background: $primary-darken-2;
+    color: $text-muted;
+}
+
+DataTable {
+    margin: 1 2;
+}
+
+DataTable > .datatable--header {
+    text-style: bold;
+    background: $primary;
+    color: $text;
+}

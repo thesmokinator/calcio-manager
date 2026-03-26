@@ -1,0 +1,216 @@
+# Calcio Manager — English locale
+
+[app]
+title = "Calcio Manager"
+subtitle = "7 - A - S I D E   F O O T B A L L   M A N A G E R  —  C S I"
+
+[menu]
+new_game = "New Game"
+load_game = "Load Game"
+settings = "Settings"
+credits = "Credits"
+quit = "Quit"
+settings_coming_soon = "Settings — coming soon!"
+info = "Info"
+
+[hub]
+next_match = "NEXT MATCH"
+standings = "STANDINGS"
+last_result = "LAST RESULT"
+squad = "SQUAD"
+season = "Season {year}"
+matchday = "Matchday {current}/{total}"
+season_completed = "Season completed!"
+home = "Home"
+away = "Away"
+points = "points"
+no_result = "No results"
+players = "{total} players ({available} avail.)"
+injured = "Injured: {count}"
+suspended = "Suspended: {count}"
+avg_ovr = "AVG OVR: {value}"
+
+[hub.bindings]
+squad = "Squad"
+calendar = "Calendar"
+league = "League"
+play_match = "Play Match"
+save = "Save"
+menu = "Menu"
+
+[new_game]
+instructions = "Choose your team — Province of Varese"
+start = "Start Game"
+back = "Back"
+select_team = "Select team"
+col_team = "Team"
+col_city = "City"
+col_formation = "Formation"
+col_tactic = "Tactic"
+col_squad = "Squad"
+col_average = "Average"
+
+[squad_screen]
+header = "Squad — {team}"
+back = "Back"
+col_role = "Role"
+col_name = "Name"
+col_age = "Age"
+col_ovr = "OVR"
+col_sho = "SHO"
+col_pas = "PAS"
+col_dri = "DRI"
+col_ftc = "FTC"
+col_pos = "POS"
+col_dec = "DEC"
+col_pac = "PAC"
+col_sta = "STA"
+col_str = "STR"
+col_condition = "Cond"
+col_status = "Status"
+injured = "Injured ({days}d)"
+suspended = "Suspended"
+low_morale = "Low morale"
+
+[league]
+header = "Standings — {name}"
+back = "Back"
+legend = "W=Wins | WP=Wins Penalties | LP=Losses Penalties | L=Losses | GD=Goal Diff."
+col_pos = "#"
+col_team = "Team"
+col_played = "P"
+col_wins = "W"
+col_wins_pen = "WP"
+col_losses_pen = "LP"
+col_losses = "L"
+col_gf = "GF"
+col_ga = "GA"
+col_gd = "GD"
+col_pts = "Pts"
+
+[calendar_screen]
+header = "Calendar — Season {year}"
+back = "Back"
+col_matchday = "MD"
+col_date = "Date"
+col_home = "Home"
+col_away = "Away"
+col_result = "Result"
+
+[match]
+first_half = "First Half"
+half_time = "Half Time"
+second_half = "Second Half"
+full_time = "Full Time"
+penalties = "Penalty Shootout"
+pause = "PAUSE"
+referee = "Referee"
+attendance = "Attendance"
+matchday = "Matchday {day}"
+province_of = "{city}, Province of {province}"
+pen_abbr = "pen."
+
+[match.bindings]
+start = "Start"
+pause = "Pause"
+resume = "Resume"
+second_half = "Second Half"
+penalties = "Penalties"
+continue = "Continue"
+tactics = "Tactics"
+
+[match.tactic_dialog]
+title = "Change Tactic"
+current = "Current: {tactic}"
+
+[save_game]
+title = "Save Game"
+label = "Save name:"
+placeholder = "Save name..."
+save = "Save"
+cancel = "Cancel"
+empty_error = "Enter a name for the save."
+error = "Error"
+
+[load_game]
+title = "Load Game"
+no_saves = "No saves found."
+load = "Load"
+delete = "Delete"
+cancel = "Cancel"
+confirm = "Confirm"
+no = "No"
+delete_confirm = "Delete save [bold]{slot}[/bold]?"
+col_name = "Name"
+col_team = "Team"
+col_province = "Province"
+col_season = "Season"
+col_modified = "Last modified"
+
+[notifications]
+game_saved = "Game saved: {slot}"
+save_title = "Save"
+game_loaded = "Game loaded: {slot}"
+load_title = "Load"
+save_not_found = "Save not found."
+season_completed = "Season completed!"
+end = "End"
+
+[roles]
+GK = "GK"
+DEF = "DEF"
+MID = "MID"
+FWD = "FWD"
+
+[standings_abbr]
+wins = "W"
+wins_pen = "Wp"
+losses_pen = "Lp"
+losses = "L"
+gf = "GF"
+ga = "GA"
+gd = "GD"
+
+[divisions]
+eccellenza = "Eccellenza"
+serie_oro = "Serie Oro"
+serie_argento = "Serie Argento"
+
+[tactics]
+difensiva = "Defensive"
+equilibrata = "Balanced"
+offensiva = "Attacking"
+contropiede = "Counter-Attack"
+
+[competition]
+name_template = "CSI {province} Championship — {division}"
+
+[weather]
+fog = "Fog"
+overcast = "Overcast"
+rain = "Rain"
+snow = "Snow"
+partly_cloudy = "Partly cloudy"
+clear = "Clear"
+thunderstorm = "Thunderstorm"
+
+[dates]
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+[credits]
+title = "Credits"
+version = "Version"
+author = "Author"
+license = "License"
+repository = "Repository"
+back = "Back"
+close = "Close"
+
+[settings]
+title = "Settings"
+language = "Language"
+save = "Save"
+cancel = "Cancel"
+back = "Back"
+saved = "Settings saved. Restart the game to apply the new language."

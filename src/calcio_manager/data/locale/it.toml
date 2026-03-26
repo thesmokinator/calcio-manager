@@ -1,0 +1,216 @@
+# Calcio Manager — Italian locale
+
+[app]
+title = "Calcio Manager"
+subtitle = "G E S T I O N A L E   C A L C I O   A   7  —  C S I"
+
+[menu]
+new_game = "Nuova Partita"
+load_game = "Carica Partita"
+settings = "Impostazioni"
+credits = "Crediti"
+quit = "Esci"
+settings_coming_soon = "Impostazioni — in arrivo!"
+info = "Info"
+
+[hub]
+next_match = "PROSSIMA PARTITA"
+standings = "CLASSIFICA"
+last_result = "ULTIMO RISULTATO"
+squad = "ROSA"
+season = "Stagione {year}"
+matchday = "Giornata {current}/{total}"
+season_completed = "Stagione completata!"
+home = "Casa"
+away = "Trasferta"
+points = "punti"
+no_result = "Nessun risultato"
+players = "{total} giocatori ({available} disp.)"
+injured = "Infortunati: {count}"
+suspended = "Squalificati: {count}"
+avg_ovr = "OVR medio: {value}"
+
+[hub.bindings]
+squad = "Rosa"
+calendar = "Calendario"
+league = "Classifica"
+play_match = "Gioca Partita"
+save = "Salva"
+menu = "Menu"
+
+[new_game]
+instructions = "Scegli la tua squadra — Provincia di Varese"
+start = "Inizia Partita"
+back = "Indietro"
+select_team = "Scegli squadra"
+col_team = "Squadra"
+col_city = "Città"
+col_formation = "Formazione"
+col_tactic = "Tattica"
+col_squad = "Rosa"
+col_average = "Media"
+
+[squad_screen]
+header = "Rosa — {team}"
+back = "Indietro"
+col_role = "Ruolo"
+col_name = "Nome"
+col_age = "Età"
+col_ovr = "OVR"
+col_sho = "TIR"
+col_pas = "PAS"
+col_dri = "DRI"
+col_ftc = "CTR"
+col_pos = "POS"
+col_dec = "DEC"
+col_pac = "VEL"
+col_sta = "RES"
+col_str = "FOR"
+col_condition = "Cond"
+col_status = "Stato"
+injured = "Infortunato ({days}g)"
+suspended = "Squalificato"
+low_morale = "Morale basso"
+
+[league]
+header = "Classifica — {name}"
+back = "Indietro"
+legend = "V=Vittorie | VR=Vittorie Rigori | SR=Sconfitte Rigori | S=Sconfitte | DR=Diff.Reti"
+col_pos = "#"
+col_team = "Squadra"
+col_played = "PG"
+col_wins = "V"
+col_wins_pen = "VR"
+col_losses_pen = "SR"
+col_losses = "S"
+col_gf = "GF"
+col_ga = "GS"
+col_gd = "DR"
+col_pts = "Pt"
+
+[calendar_screen]
+header = "Calendario — Stagione {year}"
+back = "Indietro"
+col_matchday = "G."
+col_date = "Data"
+col_home = "Casa"
+col_away = "Trasferta"
+col_result = "Risultato"
+
+[match]
+first_half = "Primo Tempo"
+half_time = "Intervallo"
+second_half = "Secondo Tempo"
+full_time = "Fine Partita"
+penalties = "Calci di Rigore"
+pause = "PAUSA"
+referee = "Arbitro"
+attendance = "Spettatori"
+matchday = "Giornata {day}"
+province_of = "{city}, Provincia di {province}"
+pen_abbr = "rig."
+
+[match.bindings]
+start = "Inizia"
+pause = "Pausa"
+resume = "Riprendi"
+second_half = "Secondo Tempo"
+penalties = "Calci di Rigore"
+continue = "Continua"
+tactics = "Tattica"
+
+[match.tactic_dialog]
+title = "Cambia Tattica"
+current = "Attuale: {tactic}"
+
+[save_game]
+title = "Salva Partita"
+label = "Nome salvataggio:"
+placeholder = "Nome salvataggio..."
+save = "Salva"
+cancel = "Annulla"
+empty_error = "Inserisci un nome per il salvataggio."
+error = "Errore"
+
+[load_game]
+title = "Carica Partita"
+no_saves = "Nessun salvataggio trovato."
+load = "Carica"
+delete = "Cancella"
+cancel = "Annulla"
+confirm = "Conferma"
+no = "No"
+delete_confirm = "Eliminare il salvataggio [bold]{slot}[/bold]?"
+col_name = "Nome"
+col_team = "Squadra"
+col_province = "Provincia"
+col_season = "Stagione"
+col_modified = "Ultima modifica"
+
+[notifications]
+game_saved = "Partita salvata: {slot}"
+save_title = "Salvataggio"
+game_loaded = "Partita caricata: {slot}"
+load_title = "Caricamento"
+save_not_found = "Salvataggio non trovato."
+season_completed = "Stagione completata!"
+end = "Fine"
+
+[roles]
+GK = "POR"
+DEF = "DIF"
+MID = "CEN"
+FWD = "ATT"
+
+[standings_abbr]
+wins = "V"
+wins_pen = "Vr"
+losses_pen = "Pr"
+losses = "P"
+gf = "GF"
+ga = "GS"
+gd = "DR"
+
+[divisions]
+eccellenza = "Eccellenza"
+serie_oro = "Serie Oro"
+serie_argento = "Serie Argento"
+
+[tactics]
+difensiva = "Difensiva"
+equilibrata = "Equilibrata"
+offensiva = "Offensiva"
+contropiede = "Contropiede"
+
+[competition]
+name_template = "Campionato CSI {province} — {division}"
+
+[weather]
+fog = "Nebbia"
+overcast = "Coperto"
+rain = "Pioggia"
+snow = "Neve"
+partly_cloudy = "Parz. nuvoloso"
+clear = "Sereno"
+thunderstorm = "Temporale"
+
+[dates]
+days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+months = ["", "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+
+[credits]
+title = "Crediti"
+version = "Versione"
+author = "Autore"
+license = "Licenza"
+repository = "Repository"
+back = "Indietro"
+close = "Chiudi"
+
+[settings]
+title = "Impostazioni"
+language = "Lingua"
+save = "Salva"
+cancel = "Annulla"
+back = "Indietro"
+saved = "Impostazioni salvate. Riavvia il gioco per applicare la nuova lingua."
