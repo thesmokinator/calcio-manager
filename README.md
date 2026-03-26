@@ -60,7 +60,3 @@ src/calcio_manager/
     ├── widgets/   # Reusable UI components
     └── styles/    # Textual CSS
 ```
-
-## License
-
-MIT
