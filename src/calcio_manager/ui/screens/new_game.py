@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import re
 import string
 import unicodedata
 
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.reactive import reactive
-from textual.screen import Screen
+from textual.screen import ModalScreen, Screen
 from textual.widgets import (
     Button,
     DataTable,
@@ -38,16 +39,28 @@ from calcio_manager.ui.colors import ITALIAN_TO_HEX, auto_contrast, color_hex
 # All available color names for team customization
 _COLOR_NAMES = list(ITALIAN_TO_HEX.keys())
 
-def _safe_id(text: str) -> str:
-    """Convert any text to a valid Textual CSS identifier.
+_HEX_PATTERN = re.compile(r"^#[0-9a-fA-F]{6}$")
 
-    Strips accents, replaces non-alphanumeric chars with underscores.
-    """
-    # Normalize unicode: è→e, ù→u, etc.
+
+def _safe_id(text: str) -> str:
+    """Convert any text to a valid Textual CSS identifier."""
     nfkd = unicodedata.normalize("NFKD", text)
     ascii_text = nfkd.encode("ascii", "ignore").decode("ascii")
-    # Replace non-alnum with underscore
     return "".join(c if c.isalnum() else "_" for c in ascii_text)
+
+
+def _color_label(color: str) -> str:
+    """Return a display label for a color (named or custom hex)."""
+    if color.startswith("#"):
+        return color.upper()
+    return t(f"colors.{color}")
+
+
+def _color_to_hex(color: str) -> str:
+    """Resolve a color (named or custom hex) to a hex code."""
+    if color.startswith("#"):
+        return color
+    return color_hex(color)
 
 
 _STEP_TITLES = {
@@ -58,6 +71,155 @@ _STEP_TITLES = {
     5: "wizard.step_preview",
 }
 
+
+# ---------------------------------------------------------------------------
+# Color picker modal
+# ---------------------------------------------------------------------------
+
+class ColorPickerModal(ModalScreen[str | None]):
+    """Modal dialog for choosing a team color."""
+
+    BINDINGS = [
+        ("escape", "cancel", t("wizard.back")),
+    ]
+
+    CSS = """
+    ColorPickerModal {
+        align: center middle;
+    }
+
+    #color-dialog {
+        width: 70;
+        height: auto;
+        max-height: 80%;
+        background: $surface;
+        border: thick $primary;
+        padding: 1 2;
+    }
+
+    #color-dialog-title {
+        text-align: center;
+        text-style: bold;
+        padding: 0 0 1 0;
+    }
+
+    #color-palette {
+        layout: grid;
+        grid-size: 5;
+        grid-gutter: 1;
+        grid-rows: auto;
+        height: auto;
+        width: 100%;
+    }
+
+    .palette-btn {
+        width: 100%;
+        height: 3;
+        content-align: center middle;
+        text-align: center;
+    }
+
+    #hex-section {
+        margin: 1 0 0 0;
+        height: auto;
+    }
+
+    #hex-section Label {
+        margin: 0 0 0 0;
+    }
+
+    #hex-input {
+        margin: 0 0 0 0;
+    }
+
+    #hex-row {
+        height: auto;
+        align: left middle;
+    }
+
+    #hex-preview {
+        width: 6;
+        height: 3;
+        margin: 0 0 0 1;
+    }
+
+    #hex-apply {
+        margin: 0 0 0 1;
+    }
+    """
+
+    def __init__(self, title: str, current: str) -> None:
+        super().__init__()
+        self._title = title
+        self._current = current
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="color-dialog"):
+            yield Label(self._title, id="color-dialog-title")
+
+            with Horizontal(id="color-palette"):
+                for c in _COLOR_NAMES:
+                    yield Button(
+                        _color_label(c),
+                        id=f"pal-{c}",
+                        classes="palette-btn",
+                    )
+
+            with Vertical(id="hex-section"):
+                yield Label(t("wizard.custom_hex"))
+                with Horizontal(id="hex-row"):
+                    yield Input(
+                        placeholder="#FF5500",
+                        id="hex-input",
+                        max_length=7,
+                    )
+                    yield Static(" ", id="hex-preview")
+                    yield Button(
+                        "OK",
+                        id="hex-apply",
+                        variant="primary",
+                    )
+
+    def on_mount(self) -> None:
+        """Style palette buttons with their colors."""
+        for c in _COLOR_NAMES:
+            btn = self.query_one(f"#pal-{c}", Button)
+            hex_c = color_hex(c)
+            fg = auto_contrast(hex_c)
+            btn.styles.background = hex_c
+            btn.styles.color = fg
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle palette button or hex apply."""
+        btn_id = event.button.id or ""
+        if btn_id.startswith("pal-"):
+            self.dismiss(btn_id[4:])
+        elif btn_id == "hex-apply":
+            self._apply_hex()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Update hex preview as user types."""
+        if event.input.id == "hex-input":
+            val = event.value.strip()
+            preview = self.query_one("#hex-preview", Static)
+            if _HEX_PATTERN.match(val):
+                preview.styles.background = val
+            else:
+                preview.styles.background = "#808080"
+
+    def _apply_hex(self) -> None:
+        """Apply the custom hex value."""
+        val = self.query_one("#hex-input", Input).value.strip()
+        if _HEX_PATTERN.match(val):
+            self.dismiss(val.lower())
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+
+# ---------------------------------------------------------------------------
+# Result
+# ---------------------------------------------------------------------------
 
 class NewGameResult:
     """Result of the wizard: human team, all teams by girone, and config info."""
@@ -78,6 +240,10 @@ class NewGameResult:
         self.comune = comune
         self.season_year = season_year
 
+
+# ---------------------------------------------------------------------------
+# Main wizard screen
+# ---------------------------------------------------------------------------
 
 class NewGameScreen(Screen[NewGameResult | None]):
     """Multi-step wizard for starting a new career."""
@@ -105,7 +271,7 @@ class NewGameScreen(Screen[NewGameResult | None]):
         margin: 1 2;
     }
 
-    /* -- Grid selection (regions & provinces) -- */
+    /* -- Grid selection (regions, provinces, comuni) -- */
 
     .box-grid {
         height: 1fr;
@@ -147,25 +313,13 @@ class NewGameScreen(Screen[NewGameResult | None]):
         margin: 0 0 1 0;
     }
 
-    .color-grid {
-        layout: grid;
-        grid-size: 5;
-        grid-gutter: 1;
-        grid-rows: auto;
-        height: auto;
-        width: 100%;
-    }
-
-    .color-btn {
+    .color-box {
         width: 100%;
         height: 3;
         content-align: center middle;
         text-align: center;
-        min-width: 12;
-    }
-
-    .color-btn.selected {
-        border: heavy white;
+        text-style: bold;
+        margin: 0 0 1 0;
     }
 
     #color-preview-bar {
@@ -227,20 +381,17 @@ class NewGameScreen(Screen[NewGameResult | None]):
         self._season_year = compute_season_year(default_start_year())
 
     def compose(self) -> ComposeResult:
-        yield Label(
-            t("wizard.step_region"),
-            id="step-header",
-        )
+        yield Label(t("wizard.step_region"), id="step-header")
 
-        # Step 1: Region selection — grid of boxes
+        # Step 1: Region selection
         with Vertical(id="step-1", classes="wizard-step"):
             yield VerticalScroll(id="region-grid", classes="box-grid")
 
-        # Step 2: Province selection — grid of boxes
+        # Step 2: Province selection
         with Vertical(id="step-2", classes="wizard-step"):
             yield VerticalScroll(id="province-grid", classes="box-grid")
 
-        # Step 3: Comune selection — search + grid of boxes
+        # Step 3: Comune selection
         with Vertical(id="step-3", classes="wizard-step"):
             yield Input(
                 placeholder=t("wizard.search_placeholder"),
@@ -250,33 +401,24 @@ class NewGameScreen(Screen[NewGameResult | None]):
             yield VerticalScroll(id="comune-grid", classes="box-grid")
 
         # Step 4: Team customization
-        with Vertical(id="step-4", classes="wizard-step"), VerticalScroll(id="customize-form"):
-            yield Label(t("wizard.team_name_label"), classes="form-label")
-            yield Input(id="input-team-name")
+        with (
+            Vertical(id="step-4", classes="wizard-step"),
+            VerticalScroll(id="customize-form"),
+        ):
+                yield Label(t("wizard.team_name_label"), classes="form-label")
+                yield Input(id="input-team-name")
 
-            yield Label(t("wizard.color1_label"), classes="form-label")
-            with Horizontal(id="color-grid-1", classes="color-grid"):
-                for c in _COLOR_NAMES:
-                    yield Button(
-                        t(f"colors.{c}"),
-                        classes="color-btn",
-                        id=f"c1-{c}",
-                    )
+                yield Label(t("wizard.color1_label"), classes="form-label")
+                yield Button("", id="color-box-1", classes="color-box")
 
-            yield Label(t("wizard.color2_label"), classes="form-label")
-            with Horizontal(id="color-grid-2", classes="color-grid"):
-                for c in _COLOR_NAMES:
-                    yield Button(
-                        t(f"colors.{c}"),
-                        classes="color-btn",
-                        id=f"c2-{c}",
-                    )
+                yield Label(t("wizard.color2_label"), classes="form-label")
+                yield Button("", id="color-box-2", classes="color-box")
 
-            yield Static("", id="color-preview-bar")
+                yield Static("", id="color-preview-bar")
 
-            yield Label(t("wizard.stadium_label"), classes="form-label")
-            yield Input(id="input-stadium")
-            yield Label("", id="customize-error", classes="error-label")
+                yield Label(t("wizard.stadium_label"), classes="form-label")
+                yield Input(id="input-stadium")
+                yield Label("", id="customize-error", classes="error-label")
 
         # Step 5: Tournament preview
         with Vertical(id="step-5", classes="wizard-step"):
@@ -290,9 +432,10 @@ class NewGameScreen(Screen[NewGameResult | None]):
         """Load regions and populate the grid."""
         self._regions = get_regions()
         await self._populate_region_grid()
-        self._apply_color_swatches()
-        self._update_color_selection_ui()
+        self._update_color_boxes()
         self._update_step_visibility()
+
+    # -- Grid population ------------------------------------------------------
 
     async def _populate_region_grid(self) -> None:
         """Fill the region grid with buttons."""
@@ -304,8 +447,7 @@ class NewGameScreen(Screen[NewGameResult | None]):
             btn_id = f"reg-{_safe_id(region)}"
             self._region_map[btn_id] = region
             buttons.append(Button(region, id=btn_id, classes="grid-btn"))
-        container = Horizontal(*buttons, classes="box-grid-inner")
-        await grid.mount(container)
+        await grid.mount(Horizontal(*buttons, classes="box-grid-inner"))
 
     async def _populate_province_grid(self) -> None:
         """Fill the province grid with buttons."""
@@ -317,18 +459,77 @@ class NewGameScreen(Screen[NewGameResult | None]):
             btn_id = f"prov-{_safe_id(province)}"
             self._province_map[btn_id] = province
             buttons.append(Button(province, id=btn_id, classes="grid-btn"))
-        container = Horizontal(*buttons, classes="box-grid-inner")
-        await grid.mount(container)
+        await grid.mount(Horizontal(*buttons, classes="box-grid-inner"))
 
-    def _apply_color_swatches(self) -> None:
-        """Set background and text colors on all color swatch buttons."""
-        for prefix in ("c1", "c2"):
-            for c in _COLOR_NAMES:
-                btn = self.query_one(f"#{prefix}-{c}", Button)
-                hex_c = color_hex(c)
-                fg = auto_contrast(hex_c)
-                btn.styles.background = hex_c
-                btn.styles.color = fg
+    async def _populate_comune_grid(
+        self, items: list[str] | None = None,
+    ) -> None:
+        """Fill the comune grid with buttons."""
+        grid = self.query_one("#comune-grid", VerticalScroll)
+        await grid.remove_children()
+        display_items = items if items is not None else self._comuni
+        self._comune_map: dict[str, str] = {}
+        buttons: list[Button] = []
+        for comune in display_items:
+            btn_id = f"com-{_safe_id(comune)}"
+            self._comune_map[btn_id] = comune
+            buttons.append(Button(comune, id=btn_id, classes="grid-btn"))
+        await grid.mount(Horizontal(*buttons, classes="box-grid-inner"))
+
+    # -- Color boxes ----------------------------------------------------------
+
+    def _update_color_boxes(self) -> None:
+        """Update the two color box buttons and preview bar."""
+        for attr, box_id in [
+            ("_color1", "color-box-1"),
+            ("_color2", "color-box-2"),
+        ]:
+            color = getattr(self, attr)
+            hex_c = _color_to_hex(color)
+            fg = auto_contrast(hex_c)
+            label = _color_label(color)
+            btn = self.query_one(f"#{box_id}", Button)
+            btn.label = label
+            btn.styles.background = hex_c
+            btn.styles.color = fg
+
+        # Preview bar
+        hex1 = _color_to_hex(self._color1)
+        hex2 = _color_to_hex(self._color2)
+        fg1 = auto_contrast(hex1)
+        fg2 = auto_contrast(hex2)
+        label1 = _color_label(self._color1)
+        label2 = _color_label(self._color2)
+        preview = self.query_one("#color-preview-bar", Static)
+        preview.update(
+            f"[{fg1} on {hex1}]  {label1}  [/]"
+            f"[{fg2} on {hex2}]  {label2}  [/]"
+        )
+
+    def _open_color_picker(self, which: int) -> None:
+        """Open the color picker modal for color 1 or 2."""
+        if which == 1:
+            title = t("wizard.color1_label")
+            current = self._color1
+        else:
+            title = t("wizard.color2_label")
+            current = self._color2
+
+        def on_result(result: str | None) -> None:
+            if result is None:
+                return
+            if which == 1:
+                self._color1 = result
+            else:
+                self._color2 = result
+            self._update_color_boxes()
+
+        self.app.push_screen(
+            ColorPickerModal(title, current),
+            callback=on_result,
+        )
+
+    # -- Step visibility ------------------------------------------------------
 
     def watch_step(self, new_step: int) -> None:
         """Update UI when step changes."""
@@ -340,50 +541,9 @@ class NewGameScreen(Screen[NewGameResult | None]):
             container = self.query_one(f"#step-{i}")
             container.display = i == self.step
 
-        # Update header bar with step title
         header = self.query_one("#step-header", Label)
         title_key = _STEP_TITLES.get(self.step, "wizard.title")
-        step_text = t(title_key)
-        header.update(f"{step_text}  ({self.step}/5)")
-
-    async def _populate_comune_grid(self, items: list[str] | None = None) -> None:
-        """Fill the comune grid with buttons."""
-        grid = self.query_one("#comune-grid", VerticalScroll)
-        await grid.remove_children()
-        display_items = items if items is not None else self._comuni
-        self._comune_map: dict[str, str] = {}
-        buttons: list[Button] = []
-        for comune in display_items:
-            btn_id = f"com-{_safe_id(comune)}"
-            self._comune_map[btn_id] = comune
-            buttons.append(Button(comune, id=btn_id, classes="grid-btn"))
-        container = Horizontal(*buttons, classes="box-grid-inner")
-        await grid.mount(container)
-
-    # -- Color selection ------------------------------------------------------
-
-    def _update_color_selection_ui(self) -> None:
-        """Update color swatch borders and preview bar."""
-        for prefix, selected in [("c1", self._color1), ("c2", self._color2)]:
-            for c in _COLOR_NAMES:
-                btn = self.query_one(f"#{prefix}-{c}", Button)
-                if c == selected:
-                    btn.add_class("selected")
-                else:
-                    btn.remove_class("selected")
-
-        # Update preview bar with auto-contrast text
-        hex1 = color_hex(self._color1)
-        hex2 = color_hex(self._color2)
-        fg1 = auto_contrast(hex1)
-        fg2 = auto_contrast(hex2)
-        label1 = t(f"colors.{self._color1}")
-        label2 = t(f"colors.{self._color2}")
-        preview = self.query_one("#color-preview-bar", Static)
-        preview.update(
-            f"[{fg1} on {hex1}]  {label1}  [/]"
-            f"[{fg2} on {hex2}]  {label2}  [/]"
-        )
+        header.update(f"{t(title_key)}  ({self.step}/5)")
 
     # -- Event handlers -------------------------------------------------------
 
@@ -397,10 +557,9 @@ class NewGameScreen(Screen[NewGameResult | None]):
             await self._populate_comune_grid(filtered)
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Handle all button presses: grid selection + actions."""
+        """Handle all button presses."""
         btn_id = event.button.id or ""
 
-        # Region grid button
         if btn_id.startswith("reg-"):
             region = self._region_map.get(btn_id, "")
             if region:
@@ -409,7 +568,6 @@ class NewGameScreen(Screen[NewGameResult | None]):
                 await self._populate_province_grid()
                 self.step = 2
 
-        # Province grid button
         elif btn_id.startswith("prov-"):
             province = self._province_map.get(btn_id, "")
             if province:
@@ -419,7 +577,6 @@ class NewGameScreen(Screen[NewGameResult | None]):
                 await self._populate_comune_grid()
                 self.step = 3
 
-        # Comune grid button
         elif btn_id.startswith("com-"):
             comune = getattr(self, "_comune_map", {}).get(btn_id, "")
             if comune:
@@ -427,24 +584,24 @@ class NewGameScreen(Screen[NewGameResult | None]):
                 self._setup_customize_step()
                 self.step = 4
 
-        # Color picker buttons
-        elif btn_id.startswith("c1-"):
-            self._color1 = btn_id[3:]
-            self._update_color_selection_ui()
-        elif btn_id.startswith("c2-"):
-            self._color2 = btn_id[3:]
-            self._update_color_selection_ui()
+        elif btn_id == "color-box-1":
+            self._open_color_picker(1)
 
+        elif btn_id == "color-box-2":
+            self._open_color_picker(2)
+
+    # -- Customize step -------------------------------------------------------
 
     def _setup_customize_step(self) -> None:
         """Pre-fill customization form with defaults."""
         self.query_one("#input-team-name", Input).value = self._selected_comune
-        self.query_one("#input-stadium", Input).value = (
-            f"Campo Sportivo {self._selected_comune}"
+        self.query_one("#input-stadium", Input).value = t(
+            "wizard.stadium_default", comune=self._selected_comune,
         )
+        self._update_color_boxes()
 
     def _validate_customize(self) -> bool:
-        """Validate the customization form. Returns True if valid."""
+        """Validate the customization form."""
         error_label = self.query_one("#customize-error", Label)
 
         team_name = self.query_one("#input-team-name", Input).value.strip()
@@ -463,6 +620,8 @@ class NewGameScreen(Screen[NewGameResult | None]):
 
         error_label.update("")
         return True
+
+    # -- Tournament generation ------------------------------------------------
 
     def _generate_tournament(self) -> None:
         """Generate teams and gironi for the tournament preview."""
@@ -497,11 +656,7 @@ class NewGameScreen(Screen[NewGameResult | None]):
         self._render_preview()
 
     def _render_preview(self) -> None:
-        """Render the gironi preview.
-
-        Shows the human team's girone as a full table,
-        other gironi as compact one-line summaries.
-        """
+        """Render the gironi preview."""
         total_teams = sum(len(g) for g in self._gironi)
 
         summary = self.query_one("#preview-summary", Label)
@@ -524,9 +679,12 @@ class NewGameScreen(Screen[NewGameResult | None]):
         # Render human girone as full table
         human_girone = self._gironi[human_girone_idx]
         idx_h = human_girone_idx
-        letter = string.ascii_uppercase[idx_h] if idx_h < 26 else str(idx_h + 1)
+        letter = (
+            string.ascii_uppercase[idx_h] if idx_h < 26 else str(idx_h + 1)
+        )
         container.mount(Label(
-            t("wizard.girone_header", letter=letter) + f" {t('wizard.your_team')}",
+            t("wizard.girone_header", letter=letter)
+            + f" {t('wizard.your_team')}",
             classes="girone-label",
         ))
 
@@ -539,17 +697,17 @@ class NewGameScreen(Screen[NewGameResult | None]):
         )
         for team in human_girone:
             marker = f" {t('wizard.your_team')}" if team.is_human else ""
-            c1_label = t(f"colors.{team.colors[0]}")
-            c2_label = t(f"colors.{team.colors[1]}")
+            c1 = _color_label(team.colors[0])
+            c2 = _color_label(team.colors[1])
             table.add_row(
                 f"{team.name}{marker}",
                 team.city,
-                f"{c1_label}/{c2_label}",
+                f"{c1}/{c2}",
                 f"{team.squad_average_overall:.1f}",
             )
         container.mount(table)
 
-        # Render other gironi as compact summary
+        # Other gironi as compact summaries
         if len(self._gironi) > 1:
             container.mount(Label(
                 t("wizard.other_gironi"),
@@ -558,13 +716,15 @@ class NewGameScreen(Screen[NewGameResult | None]):
             for idx, girone in enumerate(self._gironi):
                 if idx == human_girone_idx:
                     continue
-                letter = string.ascii_uppercase[idx] if idx < 26 else str(idx + 1)
-                team_names = ", ".join(tm.name for tm in girone)
+                gl = (
+                    string.ascii_uppercase[idx]
+                    if idx < 26 else str(idx + 1)
+                )
+                names = ", ".join(tm.name for tm in girone)
                 container.mount(Label(
-                    f"[bold]{t('wizard.girone_header', letter=letter)}[/bold]"
-                    f" ({len(girone)}) — {team_names}",
+                    f"[bold]{t('wizard.girone_header', letter=gl)}[/bold]"
+                    f" ({len(girone)}) — {names}",
                 ))
-
 
     # -- Navigation -----------------------------------------------------------
 
@@ -582,8 +742,10 @@ class NewGameScreen(Screen[NewGameResult | None]):
         if self._human_team is None:
             return
 
-        region = get_region_for_province(self._selected_province) or self._selected_region
-
+        region = (
+            get_region_for_province(self._selected_province)
+            or self._selected_region
+        )
         self.dismiss(NewGameResult(
             human_team=self._human_team,
             gironi=self._gironi,
