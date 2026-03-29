@@ -222,7 +222,7 @@ offensiva = "Attacking"
 contropiede = "Counter-Attack"
 
 [competition]
-name_template = "CSI {province} Championship — {division}"
+name_template = "CSI {province} Championship | {division}"
 
 [weather]
 fog = "Fog"

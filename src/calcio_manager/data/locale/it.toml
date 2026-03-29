@@ -222,7 +222,7 @@ offensiva = "Offensiva"
 contropiede = "Contropiede"
 
 [competition]
-name_template = "Campionato CSI {province} — {division}"
+name_template = "Campionato CSI {province} | {division}"
 
 [weather]
 fog = "Nebbia"

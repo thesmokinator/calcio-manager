@@ -645,7 +645,7 @@ class LiveMatchScreen(Screen[Match]):
         if self._competition_name:
             label = self._competition_name
             if self._match_day > 0:
-                label += f" \u2014 {t('match.matchday', day=self._match_day)}"
+                label += f"  |  {t('match.matchday', day=self._match_day)}"
             comp_w.update(label)
 
     def _update_bottom_info(self) -> None:
