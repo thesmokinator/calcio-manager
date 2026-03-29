@@ -133,7 +133,7 @@ class CalcioManagerApp(App[None]):
                 name=t(
                     "competition.name_template",
                     province=result.province,
-                    division=f"Serie Oro - Girone {letter}",
+                    division=f"Serie Oro | Girone {letter}",
                 ),
                 format=GameFormat.C7,
                 category=AgeCategory.OPEN,
