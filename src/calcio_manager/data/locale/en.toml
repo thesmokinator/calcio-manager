@@ -90,7 +90,7 @@ argento = "Silver"
 amaranto = "Amaranth"
 
 [squad_screen]
-header = "Squad — {team}"
+header = "Squad  |  {team}"
 back = "Back"
 col_role = "Role"
 col_name = "Name"
@@ -112,7 +112,7 @@ suspended = "Suspended"
 low_morale = "Low morale"
 
 [league]
-header = "Standings — {name}"
+header = "Standings  |  {name}"
 back = "Back"
 legend = "W=Wins | WP=Wins Penalties | LP=Losses Penalties | L=Losses | GD=Goal Diff."
 col_pos = "#"
@@ -128,7 +128,7 @@ col_gd = "GD"
 col_pts = "Pts"
 
 [calendar_screen]
-header = "Calendar — Season {year}"
+header = "Calendar  |  Season {year}"
 back = "Back"
 col_matchday = "MD"
 col_date = "Date"

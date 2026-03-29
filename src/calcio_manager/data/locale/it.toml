@@ -90,7 +90,7 @@ argento = "Argento"
 amaranto = "Amaranto"
 
 [squad_screen]
-header = "Rosa — {team}"
+header = "Rosa  |  {team}"
 back = "Indietro"
 col_role = "Ruolo"
 col_name = "Nome"
@@ -112,7 +112,7 @@ suspended = "Squalificato"
 low_morale = "Morale basso"
 
 [league]
-header = "Classifica — {name}"
+header = "Classifica  |  {name}"
 back = "Indietro"
 legend = "V=Vittorie | VR=Vittorie Rigori | SR=Sconfitte Rigori | S=Sconfitte | DR=Diff.Reti"
 col_pos = "#"
@@ -128,7 +128,7 @@ col_gd = "DR"
 col_pts = "Pt"
 
 [calendar_screen]
-header = "Calendario — Stagione {year}"
+header = "Calendario  |  Stagione {year}"
 back = "Indietro"
 col_matchday = "G."
 col_date = "Data"
