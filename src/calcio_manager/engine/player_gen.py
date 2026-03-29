@@ -232,6 +232,27 @@ def generate_squad(
     return squad
 
 
+_COLORS_POOL = [
+    ("bianco", "nero"), ("rosso", "blu"), ("giallo", "verde"),
+    ("bianco", "rosso"), ("azzurro", "bianco"), ("nero", "verde"),
+    ("arancione", "nero"), ("viola", "bianco"), ("blu", "giallo"),
+    ("rosso", "nero"), ("verde", "bianco"), ("grigio", "rosso"),
+    ("granata", "bianco"), ("celeste", "nero"), ("amaranto", "bianco"),
+]
+
+_STADIUM_PREFIXES = [
+    "Campo Sportivo", "Centro Sportivo", "Stadio Comunale",
+    "Polisportiva", "Oratorio", "Campetto Comunale",
+    "Campo Parrocchiale", "Impianto Sportivo",
+]
+
+
+def _generate_stadium_name(city: str) -> str:
+    """Generate a random stadium name for a city."""
+    prefix = random.choice(_STADIUM_PREFIXES)
+    return f"{prefix} {city}"
+
+
 def generate_team(
     name: str,
     city: str,
@@ -241,6 +262,7 @@ def generate_team(
     season: str = "2025-2026",
     is_human: bool = False,
     colors: tuple[str, str] | None = None,
+    stadium_name: str = "",
 ) -> Team:
     """Generate a complete team with squad."""
     squad = generate_squad(
@@ -249,14 +271,6 @@ def generate_team(
         season=season,
     )
 
-    # Random colors (if none provided)
-    colors_pool = [
-        ("bianco", "nero"), ("rosso", "blu"), ("giallo", "verde"),
-        ("bianco", "rosso"), ("azzurro", "bianco"), ("nero", "verde"),
-        ("arancione", "nero"), ("viola", "bianco"), ("blu", "giallo"),
-        ("rosso", "nero"), ("verde", "bianco"), ("grigio", "rosso"),
-    ]
-
     formation = random.choice(Formation.default_formations())
     tactic = random.choice(list(TacticStyle))
 
@@ -264,7 +278,8 @@ def generate_team(
         name=name,
         city=city,
         province=province,
-        colors=colors if colors else random.choice(colors_pool),
+        stadium_name=stadium_name or _generate_stadium_name(city),
+        colors=colors if colors else random.choice(_COLORS_POOL),
         reputation=max(10, min(90, quality_base * 5 + random.randint(-10, 10))),
         squad=squad,
         formation=formation,
@@ -296,12 +311,7 @@ def generate_league_teams(
     random.shuffle(base_names)
 
     # Assign unique colour pairs so every team in the league is distinguishable.
-    colors_pool = [
-        ("bianco", "nero"), ("rosso", "blu"), ("giallo", "verde"),
-        ("bianco", "rosso"), ("azzurro", "bianco"), ("nero", "verde"),
-        ("arancione", "nero"), ("viola", "bianco"), ("blu", "giallo"),
-        ("rosso", "nero"), ("verde", "bianco"), ("grigio", "rosso"),
-    ]
+    colors_pool = list(_COLORS_POOL)
     random.shuffle(colors_pool)
 
     teams: list[Team] = []
@@ -337,6 +347,112 @@ def generate_league_teams(
             name=team_name,
             city=city,
             province=province.capitalize(),
+            quality_base=quality,
+            category=category,
+            season=season,
+            colors=colors_pool[i % len(colors_pool)],
+        ))
+
+    return teams
+
+
+_TEAM_PREFIXES = ["Pol.", "ASD", "US", "GS", "SS", "SC", "AC"]
+_TEAM_SUFFIXES = ["Calcio", "CSI", "Sport", "United"]
+
+
+def generate_team_name(comune: str) -> str:
+    """Generate a realistic team name from a comune name.
+
+    Randomly picks a style:
+    - Plain comune name (20%): "Barasso"
+    - Demonym "-ese"/"-ina" (25%): "Barassese", "Varesina"
+    - Prefix + comune (30%): "ASD Barasso", "Pol. Comerio"
+    - Comune + suffix (25%): "Gavirate CSI", "Varese Calcio"
+    """
+    style = random.random()
+
+    if style < 0.20:
+        return comune
+
+    if style < 0.45:
+        # Demonym form
+        name = comune.split()[0]  # Use first word for compound names
+        if name.endswith("o"):
+            return name[:-1] + "ese"
+        if name.endswith("e"):
+            return name + "se"
+        if name.endswith("a"):
+            return name[:-1] + "ese"
+        if name.endswith("i"):
+            return name[:-1] + "ese"
+        return comune
+
+    if style < 0.75:
+        prefix = random.choice(_TEAM_PREFIXES)
+        return f"{prefix} {comune}"
+
+    suffix = random.choice(_TEAM_SUFFIXES)
+    return f"{comune} {suffix}"
+
+
+def _assign_quality(index: int, total: int) -> int:
+    """Assign quality base depending on position in the roster.
+
+    Top ~15% are strong, next ~30% average, rest weaker.
+    """
+    strong_cutoff = max(1, total * 15 // 100)
+    average_cutoff = strong_cutoff + max(2, total * 30 // 100)
+
+    if index < strong_cutoff:
+        return random.randint(12, 14)
+    elif index < average_cutoff:
+        return random.randint(9, 11)
+    else:
+        return random.randint(7, 9)
+
+
+def generate_tournament_teams(
+    comuni: list[str],
+    province: str,
+    category: AgeCategory = AgeCategory.OPEN,
+    season: str = "2025-2026",
+) -> list[Team]:
+    """Generate teams for a tournament using real comuni names.
+
+    Each team is named after its comune. Quality is distributed
+    with a few strong teams, some average, and the rest weaker.
+
+    Args:
+        comuni: List of comune names to create teams for.
+        province: Province name.
+        category: Age category for player generation.
+        season: Season string.
+
+    Returns:
+        List of generated teams (one per comune).
+    """
+    colors_pool = list(_COLORS_POOL)
+    random.shuffle(colors_pool)
+
+    teams: list[Team] = []
+    indices = list(range(len(comuni)))
+    random.shuffle(indices)
+
+    used_names: set[str] = set()
+    for rank, i in enumerate(indices):
+        comune = comuni[i]
+        quality = _assign_quality(rank, len(comuni))
+
+        # Generate unique team name
+        team_name = generate_team_name(comune)
+        while team_name in used_names:
+            team_name = generate_team_name(comune)
+        used_names.add(team_name)
+
+        teams.append(generate_team(
+            name=team_name,
+            city=comune,
+            province=province,
             quality_base=quality,
             category=category,
             season=season,

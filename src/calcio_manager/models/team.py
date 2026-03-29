@@ -81,6 +81,7 @@ class Team(BaseModel):
     name: str
     city: str
     province: str = "Varese"
+    stadium_name: str = ""
     colors: tuple[str, str] = ("bianco", "nero")
     reputation: int = Field(ge=1, le=100, default=50)
     squad: list[Player] = Field(default_factory=list)

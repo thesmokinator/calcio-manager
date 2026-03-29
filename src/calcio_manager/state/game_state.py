@@ -40,11 +40,21 @@ class GameState(BaseModel):
         return self.teams.get(str(self.human_team_id))
 
     @property
-    def current_competition(self) -> Competition | None:
-        """Return the first (main) competition."""
-        if not self.competitions:
+    def human_competition(self) -> Competition | None:
+        """Return the competition containing the human team."""
+        if self.human_team_id is None:
             return None
-        return next(iter(self.competitions.values()))
+        for comp in self.competitions.values():
+            if self.human_team_id in comp.team_ids:
+                return comp
+        return None
+
+    @property
+    def current_competition(self) -> Competition | None:
+        """Return the human team's competition, or the first available."""
+        return self.human_competition or (
+            next(iter(self.competitions.values())) if self.competitions else None
+        )
 
     def get_team(self, team_id: UUID) -> Team | None:
         """Look up a team by UUID."""
