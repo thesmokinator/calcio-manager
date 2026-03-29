@@ -71,23 +71,46 @@ def generate_round_robin(
     return rounds
 
 
+def season_start_date(season_year: str) -> date:
+    """Compute the third Saturday of September for a season year.
+
+    Args:
+        season_year: Season string like "2025-2026".
+
+    Returns:
+        Date of the third Saturday of September.
+    """
+    start_year = int(season_year.split("-")[0])
+    # Find first day of September
+    sept_1 = date(start_year, 9, 1)
+    # Find first Saturday (weekday 5)
+    days_until_saturday = (5 - sept_1.weekday()) % 7
+    first_saturday = sept_1 + timedelta(days=days_until_saturday)
+    # Third Saturday = first + 14 days
+    return first_saturday + timedelta(days=14)
+
+
 def generate_match_schedule(
     rounds: list[list[tuple[UUID, UUID]]],
     competition_id: UUID,
-    start_date: date = date(2025, 9, 20),
+    start_date: date | None = None,
     interval_days: int = 7,
+    season_year: str = "2025-2026",
 ) -> tuple[list[Match], list[MatchDay]]:
     """Convert round-robin rounds into Match and MatchDay objects.
 
     Args:
         rounds: Output of generate_round_robin.
         competition_id: UUID of the competition.
-        start_date: Date of the first match day.
+        start_date: Date of the first match day. If None, computed from season_year.
         interval_days: Days between match days (typically 7 for weekly).
+        season_year: Season string, used to compute start_date if not provided.
 
     Returns:
         Tuple of (all matches, all match days).
     """
+    if start_date is None:
+        start_date = season_start_date(season_year)
     all_matches: list[Match] = []
     match_days: list[MatchDay] = []
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
@@ -10,10 +11,17 @@ from textual.app import App
 from calcio_manager.engine.calendar import generate_match_schedule, generate_round_robin
 from calcio_manager.engine.competition import initialize_standings, update_standings
 from calcio_manager.engine.match import MatchEngine
+from calcio_manager.engine.season_manager import advance_season
 from calcio_manager.i18n import t
 from calcio_manager.models.competition import Competition
 from calcio_manager.models.config import CompetitionRules, GameConfig
-from calcio_manager.models.enums import AgeCategory, CompetitionType, Division, GameFormat
+from calcio_manager.models.enums import (
+    AgeCategory,
+    CompetitionType,
+    Division,
+    GameFormat,
+    SeasonPhase,
+)
 from calcio_manager.models.match import Match
 from calcio_manager.models.season import Season
 from calcio_manager.models.team import Team
@@ -87,74 +95,104 @@ class CalcioManagerApp(App[None]):
         self.push_screen(CreditsScreen(), callback=on_credits_done)
 
     def _show_new_game(self) -> None:
-        """Show team selection screen and initialize a new game."""
+        """Show the new game wizard."""
 
-        def on_team_selected(result: NewGameResult | None) -> None:
+        def on_wizard_done(result: NewGameResult | None) -> None:
             if result is None:
                 self._show_main_menu()
                 return
 
-            self._initialize_game(result.selected, result.all_teams)
+            self._initialize_game_from_wizard(result)
             self._show_game_hub()
 
-        self.push_screen(NewGameScreen(), callback=on_team_selected)
+        self.push_screen(NewGameScreen(), callback=on_wizard_done)
 
-    def _initialize_game(self, human_team: Team, all_teams: list[Team]) -> None:
-        """Set up a new game with generated teams and schedule."""
+    def _initialize_game_from_wizard(self, result: NewGameResult) -> None:
+        """Set up a new game from the wizard result (multi-girone support)."""
         config = GameConfig(
-            province="Varese",
-            region="Lombardia",
-            num_groups=1,
-            teams_per_group=len(all_teams),
+            comune=result.comune,
+            province=result.province,
+            region=result.region,
+            num_groups=len(result.gironi),
+            teams_per_group=len(result.gironi[0]) if result.gironi else 8,
+            season_year=result.season_year,
         )
 
         rules = CompetitionRules.for_category(AgeCategory.OPEN, GameFormat.C7)
 
-        # Create competition
-        competition = Competition(
-            name=t(
-                "competition.name_template",
-                province="Varese",
-                division="Serie Oro",
-            ),
-            format=GameFormat.C7,
-            category=AgeCategory.OPEN,
-            competition_type=CompetitionType.LEAGUE,
-            division=Division.SERIE_ORO,
-            province="Varese",
-            region="Lombardia",
-            team_ids=[team.id for team in all_teams],
-            rules=rules,
-        )
+        all_teams_dict: dict[str, Team] = {}
+        all_competitions: dict[str, Competition] = {}
+        all_matches_dict: dict[str, Match] = {}
+        all_match_days = []
 
-        # Initialize standings
-        team_names = {team.id: team.name for team in all_teams}
-        initialize_standings(competition, team_names)
+        for idx, girone_teams in enumerate(result.gironi):
+            letter = chr(ord("A") + idx) if idx < 26 else str(idx + 1)
 
-        # Generate schedule (andata e ritorno)
-        rounds = generate_round_robin([team.id for team in all_teams], home_and_away=True)
-        all_matches, match_days = generate_match_schedule(
-            rounds, competition.id
-        )
+            # Create competition for this girone
+            competition = Competition(
+                name=t(
+                    "competition.name_template",
+                    province=result.province,
+                    division=f"Serie Oro - Girone {letter}",
+                ),
+                format=GameFormat.C7,
+                category=AgeCategory.OPEN,
+                competition_type=CompetitionType.LEAGUE,
+                division=Division.SERIE_ORO,
+                province=result.province,
+                region=result.region,
+                team_ids=[team.id for team in girone_teams],
+                rules=rules,
+            )
 
-        competition.total_match_days = len(match_days)
-        competition.match_ids = [m.id for m in all_matches]
+            # Initialize standings
+            team_names = {team.id: team.name for team in girone_teams}
+            initialize_standings(competition, team_names)
+
+            # Generate schedule
+            rounds = generate_round_robin(
+                [team.id for team in girone_teams], home_and_away=True,
+            )
+            matches, match_days = generate_match_schedule(
+                rounds,
+                competition.id,
+                season_year=result.season_year,
+            )
+
+            competition.total_match_days = len(match_days)
+            competition.match_ids = [m.id for m in matches]
+
+            # Collect everything
+            for team in girone_teams:
+                all_teams_dict[str(team.id)] = team
+            all_competitions[str(competition.id)] = competition
+            for m in matches:
+                all_matches_dict[str(m.id)] = m
+            all_match_days.extend(match_days)
+
+        # Sort match days by date for the unified calendar
+        all_match_days.sort(key=lambda md: md.date)
+
+        # Parse season start year for the season current_date
+        start_year = int(result.season_year.split("-")[0])
 
         # Create season
         season = Season(
-            year=config.season_year,
-            competition_ids=[competition.id],
-            calendar=match_days,
+            year=result.season_year,
+            competition_ids=[comp.id for comp in all_competitions.values()],
+            calendar=all_match_days,
+            current_date=date(start_year, 8, 1),
+            phase=SeasonPhase.PRE_SEASON,
         )
 
         # Build game state
         self.game_state = GameState(
             config=config,
             season=season,
-            teams={str(team.id): team for team in all_teams},
-            competitions={str(competition.id): competition},
-            matches={str(m.id): m for m in all_matches},
-            human_team_id=human_team.id,
+            teams=all_teams_dict,
+            competitions=all_competitions,
+            matches=all_matches_dict,
+            human_team_id=result.human_team.id,
         )
 
     def _show_game_hub(self) -> None:
@@ -236,8 +274,11 @@ class CalcioManagerApp(App[None]):
             self.game_state.human_team_id
         )
         if human_match is None:
+            # Season is over — advance to next season
+            advance_season(self.game_state)
             self.notify(
-                t("notifications.season_completed"),
+                t("notifications.season_completed") + " "
+                + t("hub.season", year=self.game_state.season.year),
                 title=t("notifications.end"),
             )
             self._show_game_hub()
@@ -272,13 +313,17 @@ class CalcioManagerApp(App[None]):
             callback=on_match_result,
         )
 
-    def _process_match_day(self, match_day: int, human_result: Match) -> None:
-        """Process all matches for a match day (simulate non-human matches)."""
-        if self.game_state is None:
-            return
+    def _get_competition_for_match(self, match: Match) -> Competition | None:
+        """Find the competition that owns a given match."""
+        comp_id = str(match.competition_id)
+        return self.game_state.competitions.get(comp_id) if self.game_state else None
 
-        competition = self.game_state.current_competition
-        if competition is None:
+    def _process_match_day(self, match_day: int, human_result: Match) -> None:
+        """Process all matches for a match day (simulate non-human matches).
+
+        Supports multi-girone: each match is assigned to its own competition.
+        """
+        if self.game_state is None:
             return
 
         engine = MatchEngine()
@@ -287,9 +332,11 @@ class CalcioManagerApp(App[None]):
         human_match_id = self._find_human_match_id(match_day)
         if human_match_id:
             self.game_state.matches[str(human_match_id)] = human_result
-            update_standings(competition, human_result)
+            comp = self._get_competition_for_match(human_result)
+            if comp:
+                update_standings(comp, human_result)
 
-        # Simulate other matches on this day
+        # Simulate other matches on this day (all gironi)
         for md in self.game_state.season.calendar:
             if md.day_number != match_day:
                 continue
@@ -304,18 +351,29 @@ class CalcioManagerApp(App[None]):
                 if home is None or away is None:
                     continue
 
-                result = engine.simulate(home, away, competition.rules)
+                comp = self._get_competition_for_match(match)
+                rules = comp.rules if comp else CompetitionRules()
+
+                result = engine.simulate(home, away, rules)
                 result.id = match.id
-                result.competition_id = competition.id
+                result.competition_id = match.competition_id
                 result.match_day = match_day
                 result.match_date = match.match_date
                 self.game_state.matches[str(mid)] = result
-                update_standings(competition, result)
+
+                if comp:
+                    update_standings(comp, result)
 
             md.played = True
             break
 
-        competition.current_match_day = match_day
+        # Update current_match_day for all affected competitions
+        for comp in self.game_state.competitions.values():
+            if any(str(mid) in {str(m) for m in comp.match_ids}
+                   for md in self.game_state.season.calendar
+                   if md.day_number == match_day
+                   for mid in md.match_ids):
+                comp.current_match_day = match_day
 
     def _find_human_match_id(self, match_day: int) -> UUID | None:
         """Find the human team's match ID for a given match day."""

@@ -6,12 +6,17 @@ Built with [Textual](https://textual.textualize.io/) for a rich TUI experience.
 
 ## Features
 
+- **Career mode** — pick any of Italy's 7,900+ comuni, customize your team, and start an indefinite career
+- **New game wizard** — multi-step setup: Regione > Provincia > Comune, team name, social colors, stadium name
+- **Multi-girone tournaments** — dynamic group structure (6-10 teams per group) based on province size, with realistic team names
 - **Team management** — manage your amateur squad, pick formations, handle player roles
 - **Match simulation** — watch games unfold with real-time commentary (in Italian)
 - **League system** — compete in a full CSI-style season with calendar, standings, and results
+- **Season transitions** — at the end of each season a new championship is generated automatically
 - **Player generation** — procedurally generated players with Italian names and realistic attributes
-- **Weather system** — dynamic weather affecting match conditions
+- **Weather system** — dynamic weather affecting match conditions (tuned for each month)
 - **Save/Load** — persist your career across sessions
+- **Internationalization** — Italian (full) and English (partial) support via TOML locale files
 
 ## Requirements
 
@@ -22,7 +27,7 @@ Built with [Textual](https://textual.textualize.io/) for a rich TUI experience.
 
 ```bash
 # Clone the repo
-git clone <repo-url> && cd quito
+git clone https://github.com/thesmokinator/calcio-manager.git && cd calcio-manager
 
 # Install dependencies
 uv sync
@@ -52,11 +57,11 @@ uv run pytest
 ```
 src/calcio_manager/
 ├── models/        # Pydantic data models (player, team, match, season, ...)
-├── engine/        # Game logic (match sim, player gen, calendar, weather, ...)
+├── engine/        # Game logic (match sim, player gen, calendar, tournament, season, ...)
 ├── state/         # Game state management and save/load
-├── data/          # Localized content (Italian names, commentary) and art assets
+├── data/          # Italian comuni database, locale files, commentary, art assets
 └── ui/
-    ├── screens/   # Textual screens (main menu, game hub, live match, ...)
+    ├── screens/   # Textual screens (wizard, game hub, live match, ...)
     ├── widgets/   # Reusable UI components
     └── styles/    # Textual CSS
 ```

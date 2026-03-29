@@ -81,6 +81,7 @@ class GameConfig(BaseModel):
 
     format: GameFormat = GameFormat.C7
     category: AgeCategory = AgeCategory.OPEN
+    comune: str = ""
     province: str = "Varese"
     region: str = "Lombardia"
     num_groups: int = 1
