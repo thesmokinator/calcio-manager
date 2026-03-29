@@ -114,7 +114,7 @@ class LeagueTableScreen(Screen[None]):
         """Show competition name as subtitle."""
         subtitle = self.query_one("#screen-subtitle", Static)
         subtitle.update(
-            t("league.header", name=self.competition.name),
+            t("league.header", name=self.competition.display_name),
         )
 
     def _populate_table(self) -> None:

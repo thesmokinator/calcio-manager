@@ -130,11 +130,7 @@ class CalcioManagerApp(App[None]):
 
             # Create competition for this girone
             competition = Competition(
-                name=t(
-                    "competition.name_template",
-                    province=result.province,
-                    division=f"Serie Oro | Girone {letter}",
-                ),
+                girone=letter,
                 format=GameFormat.C7,
                 category=AgeCategory.OPEN,
                 competition_type=CompetitionType.LEAGUE,
@@ -306,7 +302,7 @@ class CalcioManagerApp(App[None]):
                 home_team,
                 away_team,
                 rules,
-                competition_name=competition.name if competition else "",
+                competition_name=competition.display_name if competition else "",
                 match_day=human_match.match_day,
                 match_date=human_match.match_date,
             ),

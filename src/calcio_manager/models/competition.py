@@ -60,7 +60,8 @@ class Competition(BaseModel):
     """A CSI competition (league, cup, or tournament)."""
 
     id: UUID = Field(default_factory=uuid4)
-    name: str
+    name: str = ""
+    girone: str = ""
     format: GameFormat = GameFormat.C7
     category: AgeCategory = AgeCategory.OPEN
     competition_type: CompetitionType = CompetitionType.LEAGUE
@@ -80,6 +81,25 @@ class Competition(BaseModel):
     def num_teams(self) -> int:
         """Number of teams in the competition."""
         return len(self.team_ids)
+
+    @property
+    def display_name(self) -> str:
+        """Build display name dynamically from fields.
+
+        Avoids hardcoded strings — uses division and girone fields.
+        Format: "Campionato CSI {province} | {division} | Girone {girone}"
+        """
+        from calcio_manager.i18n import t
+
+        division_label = t(f"divisions.{self.division.value}")
+        label = t(
+            "competition.name_template",
+            province=self.province,
+            division=division_label,
+        )
+        if self.girone:
+            label += f"  |  {t('wizard.girone_header', letter=self.girone)}"
+        return label
 
     def get_sorted_standings(self) -> list[StandingRow]:
         """Return standings sorted by CSI tiebreaker rules.
