@@ -729,13 +729,31 @@ class NewGameScreen(Screen[NewGameResult | None]):
     # -- Navigation -----------------------------------------------------------
 
     def action_confirm(self) -> None:
-        """Handle Enter key: advance from customize or start career."""
-        if self.step == 4:
+        """Handle Enter key: advance any wizard step."""
+        if self.step == 1:
+            self._press_grid_button("#region-grid")
+        elif self.step == 2:
+            self._press_grid_button("#province-grid")
+        elif self.step == 3:
+            self._press_grid_button("#comune-grid")
+        elif self.step == 4:
             if self._validate_customize():
                 self._generate_tournament()
                 self.step = 5
         elif self.step == 5:
             self._finish()
+
+    def _press_grid_button(self, grid_id: str) -> None:
+        """Press the focused grid button, or the first one if nothing is focused."""
+        focused = self.focused
+        if isinstance(focused, Button):
+            grid = self.query_one(grid_id)
+            if focused in grid.query(Button):
+                focused.press()
+                return
+        buttons = self.query_one(grid_id).query(Button)
+        if buttons:
+            buttons.first(Button).press()
 
     def _finish(self) -> None:
         """Complete the wizard and dismiss with result."""
