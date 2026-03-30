@@ -4,11 +4,7 @@ A terminal-based football management simulation inspired by **Championship Manag
 
 Built with [Textual](https://textual.textualize.io/) for a rich TUI experience.
 
-## Demo
-
 ![Calcio Manager demo](demo.gif)
-
-> Recorded with [VHS](https://github.com/charmbracelet/vhs). Re-record with `vhs demo.tape`.
 
 ## Features
 
