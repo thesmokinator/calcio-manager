@@ -40,32 +40,32 @@ export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar
     >
       {() => (
         <section className="career-content">
-          <div className="screen-header slim">
-            <h2>Calendario</h2>
-          </div>
-          {error && <div className="error-box">{error}</div>}
           {selectedDay ? (
             <div className="calendar-pager">
-              <div className="calendar-pager__bar">
-                <button
-                  className="ghost-button"
-                  disabled={selectedDayIndex === 0}
-                  onClick={() => setSelectedDayIndex((index) => Math.max(index - 1, 0))}
-                >
-                  ← Giornata precedente
-                </button>
-                <div className="calendar-pager__summary">
-                  <strong>Giornata {selectedDay.day_number}</strong>
-                  <span>{selectedDay.date} · {playedCount}/{days.length} giocate</span>
+              <div className="calendar-heading">
+                <div>
+                  <h2>Calendario</h2>
+                  <span>Giornata {selectedDay.day_number} · {selectedDay.date} · {playedCount}/{days.length} giocate</span>
                 </div>
-                <button
-                  className="ghost-button"
-                  disabled={selectedDayIndex >= days.length - 1}
-                  onClick={() => setSelectedDayIndex((index) => Math.min(index + 1, days.length - 1))}
-                >
-                  Giornata successiva →
-                </button>
+                <div className="calendar-pager__bar">
+                  <button
+                    className="ghost-button"
+                    disabled={selectedDayIndex === 0}
+                    onClick={() => setSelectedDayIndex((index) => Math.max(index - 1, 0))}
+                  >
+                    ← Precedente
+                  </button>
+                  <button
+                    className="ghost-button"
+                    disabled={selectedDayIndex >= days.length - 1}
+                    onClick={() => setSelectedDayIndex((index) => Math.min(index + 1, days.length - 1))}
+                  >
+                    Successiva →
+                  </button>
+                </div>
               </div>
+
+              {error && <div className="error-box">{error}</div>}
 
               <div className="calendar-day-tabs" aria-label="Seleziona giornata">
                 {days.map((day, index) => (
@@ -97,7 +97,13 @@ export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar
               </section>
             </div>
           ) : (
-            <p className="muted">Calendario non disponibile.</p>
+            <>
+              <div className="screen-header slim">
+                <h2>Calendario</h2>
+              </div>
+              {error && <div className="error-box">{error}</div>}
+              <p className="muted">Calendario non disponibile.</p>
+            </>
           )}
         </section>
       )}
@@ -114,7 +120,11 @@ function CalendarScore({ score }: { score?: string | null }) {
   return (
     <strong className="calendar-score with-penalties">
       <span className="calendar-score__regular">{penaltyScore[1].trim()}</span>
-      <span className="calendar-score__shootout">DCR {penaltyScore[2].trim()}</span>
+      <span className="calendar-score__shootout">Rigori {formatPenaltyScore(penaltyScore[2])}</span>
     </strong>
   );
+}
+
+function formatPenaltyScore(score: string) {
+  return score.trim().replace(/\s*-\s*/g, ' - ');
 }

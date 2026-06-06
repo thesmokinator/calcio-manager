@@ -501,34 +501,29 @@ select:focus {
     display: grid;
     gap: 16px;
 }
-.calendar-pager__bar {
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
-    gap: 10px;
-    align-items: center;
+.calendar-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
 }
-.calendar-pager__bar button:last-child {
-    justify-self: end;
+.calendar-heading h2 {
+    line-height: 1;
 }
-.calendar-pager__summary {
-    display: grid;
-    place-items: center;
-    gap: 3px;
-    min-width: 240px;
-    padding: 10px 18px;
-    border: 1px solid var(--line);
-    background: rgba(15, 23, 42, 0.82);
-    text-transform: uppercase;
-}
-.calendar-pager__summary strong {
-    color: var(--gold);
-    font-size: 16px;
-}
-.calendar-pager__summary span {
+.calendar-heading span {
+    display: block;
+    margin-top: 6px;
     color: var(--muted);
+    text-transform: uppercase;
     font-size: 11px;
     font-weight: 900;
     letter-spacing: 0.08em;
+}
+.calendar-pager__bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
 }
 .calendar-day-tabs {
     display: grid;
@@ -566,7 +561,7 @@ select:focus {
 }
 .calendar-match {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 104px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 132px minmax(0, 1fr);
     align-items: center;
     gap: 14px;
     min-height: 44px;
@@ -601,23 +596,23 @@ select:focus {
     color: var(--muted);
 }
 .calendar-score.with-penalties {
-    grid-template-columns: auto auto;
-    gap: 6px;
-    justify-content: center;
+    gap: 5px;
+    padding-block: 6px;
     white-space: nowrap;
 }
 .calendar-score__regular {
     font-size: 15px;
 }
 .calendar-score__shootout {
-    padding: 3px 5px;
-    border: 1px solid rgba(234, 179, 8, 0.38);
+    padding: 4px 8px;
+    border: 1px solid rgba(234, 179, 8, 0.55);
     color: #fef3c7;
-    background: rgba(146, 64, 14, 0.24);
-    font-size: 9px;
+    background: rgba(146, 64, 14, 0.28);
+    font-size: 10px;
     line-height: 1;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    text-shadow: none;
 }
 .calendar-match.human {
     border-color: var(--gold);
@@ -917,5 +912,15 @@ select:focus {
     .live-controls,
     .match-meta {
         grid-template-columns: 1fr;
+    }
+    .calendar-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .calendar-pager__bar {
+        justify-content: stretch;
+    }
+    .calendar-pager__bar button {
+        flex: 1;
     }
 }
