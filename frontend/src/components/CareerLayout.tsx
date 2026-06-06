@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { api } from '../api/tauri';
 import type { GameHubDto } from '../types';
+import { useAsyncResource } from '../hooks/useAsyncResource';
+import { defaultSaveSlot } from '../utils/saveSlots';
 import { TeamBanner } from './TeamBanner';
 
 type CareerSection = 'hub' | 'squad' | 'standings' | 'calendar';
@@ -26,33 +28,30 @@ export function CareerLayout({
   onMenu,
   children,
 }: CareerLayoutProps) {
-  const [hub, setHub] = useState<GameHubDto | null>(null);
-  const [error, setError] = useState('');
+  const { data: hub, error: loadError } = useAsyncResource<GameHubDto | null>(() => api.getGameHub());
+  const [saveError, setSaveError] = useState('');
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveSlot, setSaveSlot] = useState('save1');
   const [saveMessage, setSaveMessage] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.getGameHub().then((data) => {
-      setHub(data);
-      if (data) setSaveSlot(defaultSaveSlot(data));
-    }).catch((err) => setError(String(err)));
-  }, []);
+    if (hub) setSaveSlot(defaultSaveSlot(hub));
+  }, [hub]);
 
   async function save() {
     const slot = saveSlot.trim();
     if (!slot || saving) return;
 
     setSaving(true);
-    setError('');
+    setSaveError('');
     setSaveMessage('');
     try {
       const saved = await api.saveCurrentGame(slot);
       setSaveSlot(saved.slot);
       setSaveMessage(`Salvataggio “${saved.slot}” completato.`);
     } catch (err) {
-      setError(String(err));
+      setSaveError(String(err));
     } finally {
       setSaving(false);
     }
@@ -61,9 +60,11 @@ export function CareerLayout({
   function openSaveDialog() {
     if (hub) setSaveSlot((slot) => slot || defaultSaveSlot(hub));
     setSaveMessage('');
-    setError('');
+    setSaveError('');
     setSaveDialogOpen(true);
   }
+
+  const error = saveError || loadError;
 
   if (!hub) {
     return <main className="screen stack-screen">{error ? <div className="error-box">{error}</div> : <p>Caricamento...</p>}</main>;
@@ -125,13 +126,4 @@ export function CareerLayout({
       {children(hub)}
     </main>
   );
-}
-
-function defaultSaveSlot(hub: GameHubDto) {
-  const team = hub.team.name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gi, '_')
-    .replace(/^_+|_+$/g, '');
-  return `${team || 'save'}_${hub.summary.season_year}`;
 }

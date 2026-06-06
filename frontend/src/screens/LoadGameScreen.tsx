@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { api } from '../api/tauri';
+import { useAsyncResource } from '../hooks/useAsyncResource';
 import type { SaveMetadata } from '../types';
 
 interface LoadGameScreenProps {
@@ -8,21 +9,18 @@ interface LoadGameScreenProps {
 }
 
 export function LoadGameScreen({ onLoaded, onBack }: LoadGameScreenProps) {
-  const [saves, setSaves] = useState<SaveMetadata[]>([]);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    api.listSaves().then(setSaves).catch((err) => setError(String(err)));
-  }, []);
+  const { data: saves, error: loadError, loading } = useAsyncResource<SaveMetadata[]>(() => api.listSaves());
+  const [actionError, setActionError] = useState<string>('');
+  const error = actionError || loadError;
 
   async function load(slot: string) {
-    setError('');
+    setActionError('');
     try {
       const result = await api.loadGame(slot);
       if (result) onLoaded();
-      else setError('Salvataggio non trovato.');
+      else setActionError('Salvataggio non trovato.');
     } catch (err) {
-      setError(String(err));
+      setActionError(String(err));
     }
   }
 
@@ -35,11 +33,13 @@ export function LoadGameScreen({ onLoaded, onBack }: LoadGameScreenProps) {
       {error && <div className="error-box">{error}</div>}
       <section className="panel">
         <div className="panel-body">
-          {saves.length === 0 ? (
+          {loading ? (
+            <p className="muted">Caricamento salvataggi...</p>
+          ) : (saves ?? []).length === 0 ? (
             <p className="muted">Nessun salvataggio trovato.</p>
           ) : (
             <div className="save-list">
-              {saves.map((save) => (
+              {(saves ?? []).map((save) => (
                 <button
                   key={save.slot}
                   className="save-row"

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { api } from '../api/tauri';
 import { CareerLayout } from '../components/CareerLayout';
+import { useAsyncResource } from '../hooks/useAsyncResource';
 import type { SquadDto } from '../types';
 
 interface SquadScreenProps {
@@ -13,12 +13,7 @@ interface SquadScreenProps {
 }
 
 export function SquadScreen({ onHub, onMenu, onSquad, onStandings, onCalendar, onPlayMatch }: SquadScreenProps) {
-  const [squad, setSquad] = useState<SquadDto | null>(null);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    api.getSquad().then(setSquad).catch((err) => setError(String(err)));
-  }, []);
+  const { data: squad, error, loading } = useAsyncResource<SquadDto | null>(() => api.getSquad());
 
   return (
     <CareerLayout
@@ -36,9 +31,9 @@ export function SquadScreen({ onHub, onMenu, onSquad, onStandings, onCalendar, o
             <h2>Rosa</h2>
           </div>
           {error && <div className="error-box">{error}</div>}
-          {!squad ? (
+          {loading ? (
             <p>Caricamento rosa...</p>
-          ) : (
+          ) : squad ? (
             <div className="table-shell">
               <table className="data-table">
                 <thead>
@@ -69,6 +64,8 @@ export function SquadScreen({ onHub, onMenu, onSquad, onStandings, onCalendar, o
                 </tbody>
               </table>
             </div>
+          ) : (
+            <p className="muted">Rosa non disponibile.</p>
           )}
         </section>
       )}

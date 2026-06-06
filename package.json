@@ -13,7 +13,8 @@
     "check:frontend": "npm --prefix frontend run check",
     "check:rust": "cargo check --manifest-path src-tauri/Cargo.toml",
     "build:frontend": "npm --prefix frontend run build",
-    "test": "npm run test:rust",
+    "test": "npm run test:frontend && npm run test:rust",
+    "test:frontend": "npm --prefix frontend run test",
     "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml",
     "fmt:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml"
   },

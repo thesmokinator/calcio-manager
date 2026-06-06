@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/tauri';
 import { CareerLayout } from '../components/CareerLayout';
+import { useAsyncResource } from '../hooks/useAsyncResource';
 import type { CalendarDayDto } from '../types';
+import { parseCalendarScore } from '../utils/calendarScores';
 
 interface CalendarScreenProps {
   onHub: () => void;
@@ -13,17 +15,15 @@ interface CalendarScreenProps {
 }
 
 export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar, onPlayMatch }: CalendarScreenProps) {
-  const [days, setDays] = useState<CalendarDayDto[]>([]);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-  const [error, setError] = useState('');
+  const { data: calendarDays, error, loading } = useAsyncResource<CalendarDayDto[]>(() => api.getCalendar());
+  const days = calendarDays ?? [];
 
   useEffect(() => {
-    api.getCalendar().then((items) => {
-      setDays(items);
-      const firstUnplayedIndex = items.findIndex((day) => !day.played);
-      setSelectedDayIndex(firstUnplayedIndex >= 0 ? firstUnplayedIndex : Math.max(items.length - 1, 0));
-    }).catch((err) => setError(String(err)));
-  }, []);
+    if (!calendarDays) return;
+    const firstUnplayedIndex = calendarDays.findIndex((day) => !day.played);
+    setSelectedDayIndex(firstUnplayedIndex >= 0 ? firstUnplayedIndex : Math.max(calendarDays.length - 1, 0));
+  }, [calendarDays]);
 
   const selectedDay = days[selectedDayIndex] ?? null;
   const playedCount = useMemo(() => days.filter((day) => day.played).length, [days]);
@@ -40,7 +40,9 @@ export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar
     >
       {() => (
         <section className="career-content">
-          {selectedDay ? (
+          {loading ? (
+            <p>Caricamento calendario...</p>
+          ) : selectedDay ? (
             <div className="calendar-pager">
               <div className="calendar-heading">
                 <div>
@@ -112,19 +114,14 @@ export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar
 }
 
 function CalendarScore({ score }: { score?: string | null }) {
-  if (!score) return <strong className="calendar-score pending">vs</strong>;
-
-  const penaltyScore = score.match(/^(.*?)\s*\(rig\.\s*(.*?)\)$/);
-  if (!penaltyScore) return <strong className="calendar-score">{score}</strong>;
+  const parsed = parseCalendarScore(score);
+  if (!parsed) return <strong className="calendar-score pending">vs</strong>;
+  if (!parsed.penaltyScore) return <strong className="calendar-score">{parsed.regularScore}</strong>;
 
   return (
     <strong className="calendar-score with-penalties">
-      <span className="calendar-score__regular">{penaltyScore[1].trim()}</span>
-      <span className="calendar-score__shootout">Rigori {formatPenaltyScore(penaltyScore[2])}</span>
+      <span className="calendar-score__regular">{parsed.regularScore}</span>
+      <span className="calendar-score__shootout">Rigori {parsed.penaltyScore}</span>
     </strong>
   );
-}
-
-function formatPenaltyScore(score: string) {
-  return score.trim().replace(/\s*-\s*/g, ' - ');
 }

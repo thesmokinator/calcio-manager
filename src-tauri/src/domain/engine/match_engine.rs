@@ -64,15 +64,8 @@ impl<'a> MatchState<'a> {
     }
 }
 
-fn available_players(team: &Team) -> Vec<&Player> {
-    team.squad
-        .iter()
-        .filter(|player| player.is_available())
-        .collect()
-}
-
 fn team_attack_strength(team: &Team, fatigue: f32) -> f32 {
-    let players = available_players(team);
+    let players = team.available_players();
     if players.is_empty() {
         return 1.0;
     }
@@ -110,7 +103,7 @@ fn team_attack_strength(team: &Team, fatigue: f32) -> f32 {
 }
 
 fn team_defense_strength(team: &Team, fatigue: f32) -> f32 {
-    let players = available_players(team);
+    let players = team.available_players();
     if players.is_empty() {
         return 1.0;
     }
@@ -144,7 +137,7 @@ fn team_defense_strength(team: &Team, fatigue: f32) -> f32 {
 }
 
 fn team_midfield_strength(team: &Team, fatigue: f32) -> f32 {
-    let players = available_players(team);
+    let players = team.available_players();
     let midfielders: Vec<&Player> = players
         .into_iter()
         .filter(|player| player.role == PlayerRole::Mid)
@@ -193,7 +186,7 @@ fn event_with_player(
 }
 
 fn attacking_player<R: Rng + ?Sized>(rng: &mut R, team: &Team) -> Option<Uuid> {
-    let available = available_players(team);
+    let available = team.available_players();
     let attackers: Vec<&Player> = available
         .iter()
         .copied()
@@ -207,7 +200,7 @@ fn attacking_player<R: Rng + ?Sized>(rng: &mut R, team: &Team) -> Option<Uuid> {
 }
 
 fn fouling_player<R: Rng + ?Sized>(rng: &mut R, team: &Team) -> Option<Uuid> {
-    let available = available_players(team);
+    let available = team.available_players();
     let fouling_players: Vec<&Player> = available
         .iter()
         .copied()
@@ -221,7 +214,7 @@ fn fouling_player<R: Rng + ?Sized>(rng: &mut R, team: &Team) -> Option<Uuid> {
 }
 
 fn assist_player<R: Rng + ?Sized>(rng: &mut R, team: &Team, scorer_id: Uuid) -> Option<Uuid> {
-    available_players(team)
+    team.available_players()
         .into_iter()
         .filter(|player| player.id != scorer_id && player.role != PlayerRole::Gk)
         .collect::<Vec<_>>()
@@ -453,10 +446,12 @@ pub fn simulate_penalty_shootout<R: Rng + ?Sized>(
     let mut shootout = PenaltyShootout::default();
     let home_takers = sorted_penalty_takers(home);
     let away_takers = sorted_penalty_takers(away);
-    let home_gk = available_players(home)
+    let home_gk = home
+        .available_players()
         .into_iter()
         .find(|player| player.role == PlayerRole::Gk);
-    let away_gk = available_players(away)
+    let away_gk = away
+        .available_players()
         .into_iter()
         .find(|player| player.role == PlayerRole::Gk);
 
@@ -516,7 +511,8 @@ pub fn simulate_penalty_shootout<R: Rng + ?Sized>(
 }
 
 fn sorted_penalty_takers(team: &Team) -> Vec<&Player> {
-    let mut takers: Vec<&Player> = available_players(team)
+    let mut takers: Vec<&Player> = team
+        .available_players()
         .into_iter()
         .filter(|player| player.role != PlayerRole::Gk)
         .collect();

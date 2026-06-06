@@ -173,3 +173,99 @@ impl Team {
             .count()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::domain::models::{
+        GoalkeepingAttributes, Injury, MentalAttributes, MoraleLevel, PhysicalAttributes,
+        PlayerAttributes, SeasonStats, TechnicalAttributes,
+    };
+
+    #[test]
+    fn formation_requires_six_outfield_players() {
+        assert!(Formation::new("2-3-1", 2, 3, 1).is_ok());
+        assert!(Formation::new("invalid", 2, 2, 1).is_err());
+    }
+
+    #[test]
+    fn team_finances_balance_accounts_for_income_and_expenses() {
+        let finances = TeamFinances {
+            budget: 2_000,
+            registration_fees_paid: 300,
+            sponsor_income: 500,
+            tournament_prizes: 100,
+            expenses: 250,
+        };
+
+        assert_eq!(finances.balance(), 2_050);
+    }
+
+    #[test]
+    fn team_availability_ignores_injured_and_suspended_players() {
+        let team = Team {
+            id: Uuid::new_v4(),
+            name: "ASD Test".to_string(),
+            city: "Barasso".to_string(),
+            province: "Varese".to_string(),
+            stadium_name: "Campo".to_string(),
+            colors: ("rosso".to_string(), "blu".to_string()),
+            reputation: 10,
+            squad: vec![
+                player(PlayerRole::Gk, true),
+                player(PlayerRole::Def, true),
+                player(PlayerRole::Mid, true),
+                player(PlayerRole::Fwd, true),
+                player(PlayerRole::Fwd, false),
+            ],
+            formation: Formation::default_c7(),
+            tactic: TacticStyle::Equilibrata,
+            finances: TeamFinances::default(),
+            is_human: false,
+        };
+
+        assert_eq!(team.available_players().len(), 4);
+        assert!(team.can_play());
+    }
+
+    fn player(role: PlayerRole, available: bool) -> Player {
+        Player {
+            id: Uuid::new_v4(),
+            first_name: "Mario".to_string(),
+            last_name: "Rossi".to_string(),
+            age: 24,
+            role,
+            overall: 10,
+            attributes: PlayerAttributes {
+                technical: TechnicalAttributes {
+                    passing: 10,
+                    dribbling: 10,
+                    finishing: 10,
+                    first_touch: 10,
+                },
+                mental: MentalAttributes {
+                    positioning: 10,
+                    decisions: 10,
+                    leadership: 10,
+                    teamwork: 10,
+                },
+                physical: PhysicalAttributes {
+                    pace: 10,
+                    stamina: 10,
+                    strength: 10,
+                },
+                goalkeeping: GoalkeepingAttributes::default(),
+            },
+            condition: 1.0,
+            morale: MoraleLevel::Normal,
+            injury: (!available).then(|| Injury {
+                description: "Test injury".to_string(),
+                days_remaining: 3,
+            }),
+            suspended: false,
+            yellow_card_accumulation: 0,
+            current_season_stats: SeasonStats::new("2026-2027"),
+            history: vec![],
+        }
+    }
+}

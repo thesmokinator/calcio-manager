@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { api } from '../api/tauri';
 import { CareerLayout } from '../components/CareerLayout';
+import { useAsyncResource } from '../hooks/useAsyncResource';
 import type { StandingRowDto } from '../types';
 
 interface StandingsScreenProps {
@@ -13,12 +13,7 @@ interface StandingsScreenProps {
 }
 
 export function StandingsScreen({ onHub, onMenu, onSquad, onStandings, onCalendar, onPlayMatch }: StandingsScreenProps) {
-  const [standings, setStandings] = useState<StandingRowDto[]>([]);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    api.getStandings().then(setStandings).catch((err) => setError(String(err)));
-  }, []);
+  const { data: standings, error, loading } = useAsyncResource<StandingRowDto[]>(() => api.getStandings());
 
   return (
     <CareerLayout
@@ -36,13 +31,14 @@ export function StandingsScreen({ onHub, onMenu, onSquad, onStandings, onCalenda
             <h2>Classifica</h2>
           </div>
           {error && <div className="error-box">{error}</div>}
-          <div className="table-shell">
+          {loading && <p>Caricamento classifica...</p>}
+          {!loading && <div className="table-shell">
             <table className="data-table standings-table">
               <thead>
                 <tr><th>Pos</th><th>Squadra</th><th>G</th><th>V</th><th>VR</th><th>LR</th><th>P</th><th>GF</th><th>GS</th><th>DR</th><th>PT</th></tr>
               </thead>
               <tbody>
-                {standings.map((row) => (
+                {(standings ?? []).map((row) => (
                   <tr key={row.team_id} className={row.is_human ? 'human-row' : ''}>
                     <td>{row.position}</td>
                     <td className="strong-cell">{row.team_name}</td>
@@ -59,7 +55,7 @@ export function StandingsScreen({ onHub, onMenu, onSquad, onStandings, onCalenda
                 ))}
               </tbody>
             </table>
-          </div>
+          </div>}
         </section>
       )}
     </CareerLayout>
