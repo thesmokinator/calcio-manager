@@ -1,31 +1,28 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-*.egg
-dist/
-build/
+# OS files
+.DS_Store
+Thumbs.db
 
-# Virtual environments
-.venv/
-.env/
-
-# IDE
+# IDE/editor
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
 
-# Type checking / linting caches
-.mypy_cache/
-.ruff_cache/
-.pytest_cache/
+# Environment files
+.env
+.env.*
 
-# OS files
-.DS_Store
-Thumbs.db
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+npm-debug.log*
 
-# UV
-.python-version
+# Tauri / Rust
+src-tauri/target/
+src-tauri/gen/
+
+# Build/demo artifacts
+dist/
+build/

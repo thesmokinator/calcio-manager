@@ -1,0 +1,23 @@
+{
+  "name": "calcio-manager",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "check": "npm run check:frontend && npm run check:rust",
+    "check:frontend": "npm --prefix frontend run check",
+    "check:rust": "cargo check --manifest-path src-tauri/Cargo.toml",
+    "build:frontend": "npm --prefix frontend run build",
+    "test": "npm run test:rust",
+    "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml",
+    "fmt:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  }
+}

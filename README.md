@@ -1,69 +1,98 @@
 # Calcio Manager
 
-A terminal-based football management simulation inspired by **Championship Manager 01/02**, set in the world of Italian amateur **7-a-side football (CSI)**.
+Calcio Manager è un gestionale calcistico desktop ispirato a **Championship Manager 01/02**, ambientato nel calcio amatoriale italiano **CSI a 7**.
 
-Built with [Textual](https://textual.textualize.io/) for a rich TUI experience.
+Il progetto è ora una applicazione **Tauri 2 + React + Rust**:
 
-![Calcio Manager demo](demo.gif)
+- **Rust** contiene stato, dominio e logica di gioco.
+- **React** gestisce solo interfaccia, navigazione e visualizzazione.
+- **Tauri** collega UI desktop e backend locale.
 
-## Features
+## Funzionalità
 
-- **Career mode** — pick any of Italy's 7,900+ comuni, customize your team, and start an indefinite career
-- **New game wizard** — multi-step setup: Regione > Provincia > Comune, team name, social colors, stadium name
-- **Multi-girone tournaments** — dynamic group structure (6-10 teams per group) based on province size, with realistic team names
-- **Team management** — manage your amateur squad, pick formations, handle player roles
-- **Match simulation** — watch games unfold with real-time commentary (in Italian)
-- **League system** — compete in a full CSI-style season with calendar, standings, and results
-- **Season transitions** — at the end of each season a new championship is generated automatically
-- **Player generation** — procedurally generated players with Italian names and realistic attributes
-- **Weather system** — dynamic weather affecting match conditions (tuned for each month)
-- **Save/Load** — persist your career across sessions
-- **Internationalization** — Italian (full) and English (partial) support via TOML locale files
+- **Carriera territoriale** — scegli regione, provincia e comune italiano.
+- **Nuova partita guidata** — nome squadra, colori sociali, stadio e seed opzionale.
+- **Tornei multi-girone** — gruppi generati dinamicamente in base alla provincia.
+- **Generazione squadre/giocatori** — rose procedurali con nomi italiani, ruoli e attributi.
+- **Calendario CSI-style** — round robin andata/ritorno e giornate aggregate.
+- **Simulazione partita in Rust** — eventi, statistiche, rinunce, rigori dopo pareggio.
+- **Live match React** — replay degli eventi generati dal backend.
+- **Classifiche** — punti, differenza reti, disciplina e criteri head-to-head.
+- **Transizione stagione** — al termine del calendario viene generata la stagione successiva.
+- **Salvataggi versionati** — save/load/delete/list con metadata e compatibilità legacy.
+- **Risorse dati migrate** — comuni italiani, nomi, commentary e locale TOML in `src-tauri/resources/data`.
 
-## Requirements
+## Requisiti
 
-- Python 3.12+
-- [uv](https://docs.astral.sh/uv/) (recommended package manager)
+- Node.js e npm
+- Rust stable con Cargo
+- Dipendenze di sistema richieste da Tauri 2 per il proprio OS
 
-## Getting Started
-
-```bash
-# Clone the repo
-git clone https://github.com/thesmokinator/calcio-manager.git && cd calcio-manager
-
-# Install dependencies
-uv sync
-
-# Run the game
-uv run calcio-manager
-```
-
-## Development
+## Avvio sviluppo
 
 ```bash
-# Install dev dependencies
-uv sync --all-groups
+# installa dipendenze root e frontend
+npm install
+npm --prefix frontend install
 
-# Run linter
-uv run ruff check src/ tests/
-
-# Run type checker
-uv run mypy --strict src/
-
-# Run tests
-uv run pytest
+# avvia l'app desktop in sviluppo
+npm run dev
 ```
 
-## Project Structure
+## Comandi utili
 
+```bash
+# TypeScript check frontend
+npm run check:frontend
+
+# Build frontend
+npm run build:frontend
+
+# Rust check
+npm run check:rust
+
+# Test Rust
+npm run test:rust
+
+# Check completo frontend + Rust
+npm run check
+
+# Test/check principale
+npm test
+
+# Build desktop Tauri
+npm run build
 ```
-src/calcio_manager/
-├── models/        # Pydantic data models (player, team, match, season, ...)
-├── engine/        # Game logic (match sim, player gen, calendar, tournament, season, ...)
-├── state/         # Game state management and save/load
-├── data/          # Italian comuni database, locale files, commentary, art assets
-└── ui/
-    ├── screens/   # Textual screens (wizard, game hub, live match, ...)
-    ├── widgets/   # Reusable UI components
-    └── styles/    # Textual CSS
+
+## Struttura progetto
+
+```text
+frontend/                 React + TypeScript + Vite
+  src/
+    api/                  wrapper comandi Tauri
+    screens/              schermate UI
+    components/           componenti riusabili
+    styles/               CSS globale
+
+src-tauri/                Tauri shell + backend Rust
+  src/
+    commands/             API invocate dal frontend
+    domain/
+      models/             entità serializzabili Serde
+      engine/             simulazione, calendario, classifiche, generatori
+      services/           casi d'uso applicativi
+  resources/data/         comuni, nomi, commentary, locale
 ```
+
+## Stato migrazione
+
+La migrazione da Python/Textual a Tauri/React/Rust è completata per lo stack applicativo principale. Il codice Python legacy è stato rimosso dal repository.
+
+Restano come lavoro futuro funzionalità evolutive non bloccanti:
+
+- gestione tattiche/formazioni più profonda lato backend e UI;
+- schermata impostazioni e localizzazione runtime completa;
+- ulteriore polish grafico in stile CM 01/02 moderno;
+- ampliamento continuo della copertura test Rust.
+
+Vedi `MIGRATION_TAURI.md` per il dettaglio dell'audit e delle milestone completate.
