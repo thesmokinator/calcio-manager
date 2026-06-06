@@ -1,98 +1,104 @@
-# Calcio Manager
+# CSI Calcio Manager
 
-Calcio Manager è un gestionale calcistico desktop ispirato a **Championship Manager 01/02**, ambientato nel calcio amatoriale italiano **CSI a 7**.
+CSI Calcio Manager is a desktop football management game inspired by **Championship Manager 01/02**, set in Italian amateur **CSI 7-a-side football**.
 
-Il progetto è ora una applicazione **Tauri 2 + React + Rust**:
+The project is built with **Tauri 2 + React + Rust**:
 
-- **Rust** contiene stato, dominio e logica di gioco.
-- **React** gestisce solo interfaccia, navigazione e visualizzazione.
-- **Tauri** collega UI desktop e backend locale.
+- **Rust** owns the game state, domain model, simulation engine, saves, and local data access.
+- **React** handles the desktop UI, navigation, and presentation.
+- **Tauri** bridges the local Rust backend with the frontend application.
 
-## Funzionalità
+## Features
 
-- **Carriera territoriale** — scegli regione, provincia e comune italiano.
-- **Nuova partita guidata** — nome squadra, colori sociali, stadio e seed opzionale.
-- **Tornei multi-girone** — gruppi generati dinamicamente in base alla provincia.
-- **Generazione squadre/giocatori** — rose procedurali con nomi italiani, ruoli e attributi.
-- **Calendario CSI-style** — round robin andata/ritorno e giornate aggregate.
-- **Simulazione partita in Rust** — eventi, statistiche, rinunce, rigori dopo pareggio.
-- **Live match React** — replay degli eventi generati dal backend.
-- **Classifiche** — punti, differenza reti, disciplina e criteri head-to-head.
-- **Transizione stagione** — al termine del calendario viene generata la stagione successiva.
-- **Salvataggi versionati** — save/load/delete/list con metadata e compatibilità legacy.
-- **Risorse dati migrate** — comuni italiani, nomi, commentary e locale TOML in `src-tauri/resources/data`.
+- **Local amateur career** — choose an Italian region, province, and municipality.
+- **Guided new game flow** — configure club name, colors, stadium, season, and optional seed.
+- **Dynamic multi-group tournaments** — groups are generated from the selected province.
+- **Procedural clubs and players** — Italian names, roles, attributes, and squad strength.
+- **CSI-style calendar** — two-legged round robin schedules aggregated by matchday.
+- **Rust match simulation** — events, stats, forfeits, and penalty shootouts after draws.
+- **Live match UI** — CM-style textual live commentary with always-visible stats and tabbed match details.
+- **League tables** — points, goal difference, discipline, and head-to-head criteria.
+- **Season rollover** — a new season is generated when the calendar is completed.
+- **Versioned saves** — save/load/delete/list with metadata and compatibility checks.
+- **Internal SQLite data layer** — bundled geography data is seeded into an app-local SQLite database.
 
-## Requisiti
+## Requirements
 
-- Node.js e npm
-- Rust stable con Cargo
-- Dipendenze di sistema richieste da Tauri 2 per il proprio OS
+- Node.js and npm
+- Rust stable with Cargo
+- System dependencies required by Tauri 2 for your operating system
 
-## Avvio sviluppo
+See the official Tauri prerequisites for platform-specific setup: <https://tauri.app/start/prerequisites/>
+
+## Development
+
+Install dependencies:
 
 ```bash
-# installa dipendenze root e frontend
 npm install
 npm --prefix frontend install
+```
 
-# avvia l'app desktop in sviluppo
+Run the desktop app in development mode:
+
+```bash
 npm run dev
 ```
 
-## Comandi utili
+## Useful commands
 
 ```bash
-# TypeScript check frontend
+# Frontend TypeScript check
 npm run check:frontend
 
-# Build frontend
+# Frontend production build
 npm run build:frontend
 
 # Rust check
 npm run check:rust
 
-# Test Rust
+# Rust tests
 npm run test:rust
 
-# Check completo frontend + Rust
+# Full check: frontend + Rust
 npm run check
 
-# Test/check principale
+# Main test command
 npm test
 
-# Build desktop Tauri
+# Desktop production build
 npm run build
+
+# Rust formatting
+npm run fmt:rust
 ```
 
-## Struttura progetto
+## Project structure
 
 ```text
-frontend/                 React + TypeScript + Vite
+frontend/                 React + TypeScript + Vite frontend
   src/
-    api/                  wrapper comandi Tauri
-    screens/              schermate UI
-    components/           componenti riusabili
-    styles/               CSS globale
+    api/                  Tauri command wrappers
+    components/           reusable UI components
+    screens/              application screens
+    styles/               global CSS
 
-src-tauri/                Tauri shell + backend Rust
+src-tauri/                Tauri shell + Rust backend
   src/
-    commands/             API invocate dal frontend
+    commands/             APIs invoked by the frontend
     domain/
-      models/             entità serializzabili Serde
-      engine/             simulazione, calendario, classifiche, generatori
-      services/           casi d'uso applicativi
-  resources/data/         comuni, nomi, commentary, locale
+      models/             serializable Serde domain entities
+      engine/             simulation, calendar, standings, generators
+      services/           application use cases
+  resources/data/         bundled data: municipalities, names, commentary, locale files
 ```
 
-## Stato migrazione
+## Data and saves
 
-La migrazione da Python/Textual a Tauri/React/Rust è completata per lo stack applicativo principale. Il codice Python legacy è stato rimosso dal repository.
+- Geography data is bundled with the app and seeded into an internal SQLite database under the Tauri app data directory.
+- Commentary templates and player-name resources are bundled in `src-tauri/resources/data`.
+- Game saves are versioned and stored locally by the Rust backend.
 
-Restano come lavoro futuro funzionalità evolutive non bloccanti:
+## Current focus
 
-- gestione tattiche/formazioni più profonda lato backend e UI;
-- schermata impostazioni e localizzazione runtime completa;
-- ulteriore polish grafico in stile CM 01/02 moderno;
-- ampliamento continuo della copertura test Rust.
-
-Vedi `MIGRATION_TAURI.md` per il dettaglio dell'audit e delle milestone completate.
+The application is playable as a local desktop prototype. Future work includes deeper tactics and lineup management, a complete settings/localization screen, broader Rust test coverage, and continued UI polish inspired by classic football management games.
