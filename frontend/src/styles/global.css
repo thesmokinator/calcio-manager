@@ -496,9 +496,56 @@ select:focus {
     font-weight: 900;
 }
 
-.calendar-list {
+.calendar-list,
+.calendar-pager {
     display: grid;
     gap: 16px;
+}
+.calendar-pager__bar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+.calendar-pager__bar button:last-child {
+    justify-self: end;
+}
+.calendar-pager__summary {
+    display: grid;
+    place-items: center;
+    gap: 3px;
+    min-width: 240px;
+    padding: 10px 18px;
+    border: 1px solid var(--line);
+    background: rgba(15, 23, 42, 0.82);
+    text-transform: uppercase;
+}
+.calendar-pager__summary strong {
+    color: var(--gold);
+    font-size: 16px;
+}
+.calendar-pager__summary span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+.calendar-day-tabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+    gap: 6px;
+}
+.calendar-day-tabs button {
+    min-height: 34px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: rgba(15, 23, 42, 0.72);
+    font-weight: 900;
+}
+.calendar-day-tabs button.active {
+    color: #111827;
+    background: linear-gradient(180deg, #facc15, #ca8a04);
+    border-color: #fef08a;
 }
 .calendar-day {
     border: 1px solid var(--line);
@@ -541,7 +588,7 @@ select:focus {
 .calendar-score {
     display: grid;
     place-items: center;
-    min-height: 28px;
+    min-height: 30px;
     padding: 4px 8px;
     color: var(--gold);
     background: rgba(2, 6, 23, 0.45);
@@ -554,12 +601,20 @@ select:focus {
     color: var(--muted);
 }
 .calendar-score.with-penalties {
-    gap: 2px;
-    white-space: normal;
+    grid-template-columns: auto auto;
+    gap: 6px;
+    justify-content: center;
+    white-space: nowrap;
 }
-.calendar-score.with-penalties small {
+.calendar-score__regular {
+    font-size: 15px;
+}
+.calendar-score__shootout {
+    padding: 3px 5px;
+    border: 1px solid rgba(234, 179, 8, 0.38);
     color: #fef3c7;
-    font-size: 10px;
+    background: rgba(146, 64, 14, 0.24);
+    font-size: 9px;
     line-height: 1;
     text-transform: uppercase;
     letter-spacing: 0.05em;

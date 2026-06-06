@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/tauri';
 import { CareerLayout } from '../components/CareerLayout';
 import type { CalendarDayDto } from '../types';
@@ -14,11 +14,19 @@ interface CalendarScreenProps {
 
 export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar, onPlayMatch }: CalendarScreenProps) {
   const [days, setDays] = useState<CalendarDayDto[]>([]);
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.getCalendar().then(setDays).catch((err) => setError(String(err)));
+    api.getCalendar().then((items) => {
+      setDays(items);
+      const firstUnplayedIndex = items.findIndex((day) => !day.played);
+      setSelectedDayIndex(firstUnplayedIndex >= 0 ? firstUnplayedIndex : Math.max(items.length - 1, 0));
+    }).catch((err) => setError(String(err)));
   }, []);
+
+  const selectedDay = days[selectedDayIndex] ?? null;
+  const playedCount = useMemo(() => days.filter((day) => day.played).length, [days]);
 
   return (
     <CareerLayout
@@ -36,15 +44,49 @@ export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar
             <h2>Calendario</h2>
           </div>
           {error && <div className="error-box">{error}</div>}
-          <div className="calendar-list">
-            {days.map((day) => (
-              <section key={day.day_number} className="calendar-day">
+          {selectedDay ? (
+            <div className="calendar-pager">
+              <div className="calendar-pager__bar">
+                <button
+                  className="ghost-button"
+                  disabled={selectedDayIndex === 0}
+                  onClick={() => setSelectedDayIndex((index) => Math.max(index - 1, 0))}
+                >
+                  ← Giornata precedente
+                </button>
+                <div className="calendar-pager__summary">
+                  <strong>Giornata {selectedDay.day_number}</strong>
+                  <span>{selectedDay.date} · {playedCount}/{days.length} giocate</span>
+                </div>
+                <button
+                  className="ghost-button"
+                  disabled={selectedDayIndex >= days.length - 1}
+                  onClick={() => setSelectedDayIndex((index) => Math.min(index + 1, days.length - 1))}
+                >
+                  Giornata successiva →
+                </button>
+              </div>
+
+              <div className="calendar-day-tabs" aria-label="Seleziona giornata">
+                {days.map((day, index) => (
+                  <button
+                    key={day.day_number}
+                    className={index === selectedDayIndex ? 'active' : ''}
+                    aria-label={`Vai alla giornata ${day.day_number}`}
+                    onClick={() => setSelectedDayIndex(index)}
+                  >
+                    {day.day_number}
+                  </button>
+                ))}
+              </div>
+
+              <section className="calendar-day calendar-day--single">
                 <header>
-                  <strong>Giornata {day.day_number}</strong>
-                  <span>{day.date}</span>
+                  <strong>Giornata {selectedDay.day_number}</strong>
+                  <span>{selectedDay.date}</span>
                 </header>
                 <div className="calendar-matches">
-                  {day.matches.map((match) => (
+                  {selectedDay.matches.map((match) => (
                     <div key={match.id} className={match.is_human_match ? 'calendar-match human' : 'calendar-match'}>
                       <span className="calendar-team home-team">{match.home_team}</span>
                       <CalendarScore score={match.score} />
@@ -53,8 +95,10 @@ export function CalendarScreen({ onHub, onMenu, onSquad, onStandings, onCalendar
                   ))}
                 </div>
               </section>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <p className="muted">Calendario non disponibile.</p>
+          )}
         </section>
       )}
     </CareerLayout>
@@ -69,8 +113,8 @@ function CalendarScore({ score }: { score?: string | null }) {
 
   return (
     <strong className="calendar-score with-penalties">
-      <span>{penaltyScore[1].trim()}</span>
-      <small>Rig. {penaltyScore[2].trim()}</small>
+      <span className="calendar-score__regular">{penaltyScore[1].trim()}</span>
+      <span className="calendar-score__shootout">DCR {penaltyScore[2].trim()}</span>
     </strong>
   );
 }
