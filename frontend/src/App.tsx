@@ -32,27 +32,28 @@ export default function App() {
     );
   }
 
+  const careerNav = {
+    onHub: () => setScreen('hub' as Screen),
+    onMenu: () => setScreen('menu' as Screen),
+    onSquad: () => setScreen('squad' as Screen),
+    onStandings: () => setScreen('standings' as Screen),
+    onCalendar: () => setScreen('calendar' as Screen),
+    onPlayMatch: () => setScreen('live-match' as Screen),
+  };
+
   switch (screen) {
     case 'new-game':
       return <NewGameWizard onCreated={() => setScreen('hub')} onBack={() => setScreen('menu')} />;
     case 'load-game':
       return <LoadGameScreen onLoaded={() => setScreen('hub')} onBack={() => setScreen('menu')} />;
     case 'hub':
-      return (
-        <GameHubScreen
-          onMenu={() => setScreen('menu')}
-          onSquad={() => setScreen('squad')}
-          onStandings={() => setScreen('standings')}
-          onCalendar={() => setScreen('calendar')}
-          onPlayMatch={() => setScreen('live-match')}
-        />
-      );
+      return <GameHubScreen {...careerNav} />;
     case 'squad':
-      return <SquadScreen onBack={() => setScreen('hub')} />;
+      return <SquadScreen {...careerNav} />;
     case 'standings':
-      return <StandingsScreen onBack={() => setScreen('hub')} />;
+      return <StandingsScreen {...careerNav} />;
     case 'calendar':
-      return <CalendarScreen onBack={() => setScreen('hub')} />;
+      return <CalendarScreen {...careerNav} />;
     case 'live-match':
       return <LiveMatchScreen onBack={() => setScreen('hub')} />;
     case 'menu':

@@ -187,6 +187,8 @@ export interface PlayedMatchDto {
   score: string;
   home_goals: number;
   away_goals: number;
+  home_penalty_goals?: number | null;
+  away_penalty_goals?: number | null;
   home_possession: number;
   away_possession: number;
   home_shots: number;

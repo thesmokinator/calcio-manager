@@ -182,6 +182,8 @@ pub struct PlayedMatchDto {
     pub score: String,
     pub home_goals: u32,
     pub away_goals: u32,
+    pub home_penalty_goals: Option<u32>,
+    pub away_penalty_goals: Option<u32>,
     pub home_possession: f32,
     pub away_possession: f32,
     pub home_shots: u32,
@@ -572,6 +574,8 @@ fn last_result_dto(
 }
 
 fn played_match_dto(game_state: &GameState, game_match: &Match) -> PlayedMatchDto {
+    let penalty_shootout = game_match.score.penalty_shootout.as_ref();
+
     PlayedMatchDto {
         id: game_match.id,
         home_team: team_name(game_state, game_match.home_team_id),
@@ -579,6 +583,8 @@ fn played_match_dto(game_state: &GameState, game_match: &Match) -> PlayedMatchDt
         score: game_match.score.display(),
         home_goals: game_match.score.home_goals,
         away_goals: game_match.score.away_goals,
+        home_penalty_goals: penalty_shootout.map(|shootout| shootout.home_goals()),
+        away_penalty_goals: penalty_shootout.map(|shootout| shootout.away_goals()),
         home_possession: game_match.home_possession,
         away_possession: game_match.away_possession,
         home_shots: game_match.home_shots,

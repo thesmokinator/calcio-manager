@@ -349,15 +349,26 @@ select:focus {
     letter-spacing: 0.08em;
     opacity: 0.82;
 }
-.hub-screen {
+.hub-screen,
+.career-screen {
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 .hub-nav {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 8px;
+}
+.career-nav button.active {
+    color: #111827;
+    background: linear-gradient(180deg, #facc15, #ca8a04);
+    border-color: #fef08a;
+}
+.career-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 .hub-grid {
     display: grid;
@@ -487,7 +498,7 @@ select:focus {
 
 .calendar-list {
     display: grid;
-    gap: 12px;
+    gap: 16px;
 }
 .calendar-day {
     border: 1px solid var(--line);
@@ -502,28 +513,60 @@ select:focus {
 }
 .calendar-matches {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-    gap: 8px;
+    grid-template-columns: 1fr;
+    gap: 6px;
     padding: 12px;
 }
 .calendar-match {
     display: grid;
-    grid-template-columns: 1fr 56px 1fr;
+    grid-template-columns: minmax(0, 1fr) 104px minmax(0, 1fr);
     align-items: center;
-    gap: 8px;
-    padding: 9px 10px;
+    gap: 14px;
+    min-height: 44px;
+    padding: 8px 12px;
     background: rgba(15, 23, 42, 0.68);
     border: 1px solid rgba(100, 116, 139, 0.32);
 }
-.calendar-match span:last-child {
+.calendar-team {
+    min-width: 0;
+    color: var(--text);
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.calendar-team.away-team {
     text-align: right;
 }
-.calendar-match strong {
-    text-align: center;
+.calendar-score {
+    display: grid;
+    place-items: center;
+    min-height: 28px;
+    padding: 4px 8px;
     color: var(--gold);
+    background: rgba(2, 6, 23, 0.45);
+    border: 1px solid rgba(100, 116, 139, 0.28);
+    text-align: center;
+    line-height: 1;
+    white-space: nowrap;
+}
+.calendar-score.pending {
+    color: var(--muted);
+}
+.calendar-score.with-penalties {
+    gap: 2px;
+    white-space: normal;
+}
+.calendar-score.with-penalties small {
+    color: #fef3c7;
+    font-size: 10px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 .calendar-match.human {
     border-color: var(--gold);
+    background: rgba(234, 179, 8, 0.08);
 }
 
 .live-screen {
@@ -536,7 +579,7 @@ select:focus {
 }
 .match-scoreboard {
     display: grid;
-    grid-template-columns: 1fr 220px 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 280px) minmax(0, 1fr);
     align-items: stretch;
     min-height: 112px;
     border: 1px solid var(--line-bright);
@@ -564,6 +607,28 @@ select:focus {
     font-weight: 1000;
     letter-spacing: -0.08em;
     text-shadow: 3px 3px 0 #000;
+}
+.match-score.with-penalties {
+    align-content: center;
+    gap: 8px;
+    padding: 12px 10px;
+}
+.match-score__regular,
+.match-score__penalties {
+    display: block;
+    line-height: 0.9;
+}
+.match-score__penalties {
+    padding: 5px 10px;
+    border: 1px solid rgba(234, 179, 8, 0.55);
+    color: #fef3c7;
+    background: rgba(146, 64, 14, 0.28);
+    font-size: clamp(12px, 1.2vw, 16px);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-shadow: none;
+    white-space: nowrap;
 }
 .match-meta {
     display: grid;

@@ -90,14 +90,22 @@ export function LiveMatchScreen({ onBack }: LiveMatchScreenProps) {
     );
   }
 
-  const homeGoals = currentEvent?.home_goals ?? 0;
-  const awayGoals = currentEvent?.away_goals ?? 0;
+  const homeGoals = finished ? match.home_goals : currentEvent?.home_goals ?? 0;
+  const awayGoals = finished ? match.away_goals : currentEvent?.away_goals ?? 0;
+  const hasPenaltyScore = finished && match.home_penalty_goals != null && match.away_penalty_goals != null;
 
   return (
     <main className="screen live-screen">
       <div className="match-scoreboard">
         <div className="match-team home">{match.home_team}</div>
-        <div className="match-score">{finished ? match.score : `${homeGoals} - ${awayGoals}`}</div>
+        <div className={hasPenaltyScore ? 'match-score with-penalties' : 'match-score'}>
+          <span className="match-score__regular">{homeGoals} - {awayGoals}</span>
+          {hasPenaltyScore && (
+            <span className="match-score__penalties">
+              Rigori {match.home_penalty_goals} - {match.away_penalty_goals}
+            </span>
+          )}
+        </div>
         <div className="match-team away">{match.away_team}</div>
       </div>
 
